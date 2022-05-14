@@ -1,0 +1,56 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://textures/Gui/worldSelect.png" type="Texture" id=1]
+[ext_resource path="res://fonts/Regular.tres" type="DynamicFont" id=2]
+[ext_resource path="res://textures/Gui/worldMouseSelect.png" type="Texture" id=3]
+[ext_resource path="res://scripts/Menu/WorldSelectButton.gd" type="Script" id=4]
+
+[node name="WorldSelect" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 0.0900269
+margin_right = 0.0900879
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Back" type="TextureButton" parent="."]
+margin_right = 192.0
+margin_bottom = 32.0
+toggle_mode = true
+texture_pressed = ExtResource( 1 )
+texture_hover = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DisplayName" type="Label" parent="."]
+margin_left = 0.934578
+margin_top = 0.109953
+margin_right = 495.935
+margin_bottom = 50.11
+rect_scale = Vector2( 0.25, 0.25 )
+custom_fonts/font = ExtResource( 2 )
+custom_colors/font_color_shadow = Color( 0.286275, 0.286275, 0.286275, 1 )
+custom_constants/shadow_offset_x = 4
+custom_constants/shadow_offset_y = 4
+text = "Very Cool and Good"
+
+[node name="FileData" type="Label" parent="."]
+anchor_left = 6.20882e-11
+anchor_right = 6.20882e-11
+margin_left = 1.72235
+margin_top = 11.6279
+margin_right = 496.722
+margin_bottom = 61.6279
+rect_scale = Vector2( 0.15, 0.15 )
+custom_fonts/font = ExtResource( 2 )
+custom_colors/font_color = Color( 0.552941, 0.552941, 0.552941, 1 )
+text = "Very Cool and Good (11/12/21 11:27)
+Survival, Ver 0.3.9"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="pressed" from="Back" to="." method="_on_Back_pressed"]

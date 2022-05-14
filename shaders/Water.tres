@@ -1,0 +1,22 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform float shade = 0;
+uniform float value = 1.0;
+
+void fragment() {
+	float realValue = 1.0-value;
+	float visible = 0.75;
+	vec2 realUV = vec2((UV.x*512.0-floor(UV.x*512.0/16.0)*16.0)/16.0,(UV.y*512.0-floor(UV.y*512.0/16.0)*16.0)/16.0);
+	if (realUV.y <= realValue) {
+		visible = 0.0
+	}
+	COLOR = texture(TEXTURE,UV) * vec4(0.25,0.5,1.0*shade,visible);
+}"
+
+[resource]
+shader = SubResource( 1 )
+shader_param/shade = 1.0
+shader_param/value = 1.0

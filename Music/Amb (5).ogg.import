@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/Amb (5).ogg-754c05849b6582e5cfd2d30cd66f1479.oggstr"
+
+[deps]
+
+source_file="res://Music/Amb (5).ogg"
+dest_files=[ "res://.import/Amb (5).ogg-754c05849b6582e5cfd2d30cd66f1479.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0
