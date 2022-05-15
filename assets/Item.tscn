@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://scripts/Item.gd" type="Script" id=1]
-[ext_resource path="res://textures/Blocks/grass_block_side.png" type="Texture" id=2]
+[ext_resource path="res://textures/Blocks/grass_block.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 2.95, 2.95 )

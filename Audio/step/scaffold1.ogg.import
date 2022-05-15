@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/scaffold1.ogg-d5f43905f5ec554f4773edebe79d7536.oggstr"
+
+[deps]
+
+source_file="res://Audio/step/scaffold1.ogg"
+dest_files=[ "res://.import/scaffold1.ogg-d5f43905f5ec554f4773edebe79d7536.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

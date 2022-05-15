@@ -31,7 +31,8 @@ func render():
 	if z == 0:
 		$Sprite.material.set_shader_param("layerShade",0.75)
 		$CollisionShape2D.disabled = true
-	$Sprite.texture = get_node("../../../CanvasLayer/hotbar").textures[id]
+	var sus = main.block_data.keys()
+	$Sprite.texture = load("res://textures/Blocks/" + main.block_data[id].texture + ".png")
 	match id:
 		5:
 			$Sprite.material.set_shader_param("color",Color(0.25,0.56,0.11,1.0))

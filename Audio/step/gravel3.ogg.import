@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/gravel3.ogg-18f8c01d83550b25102d3e307828ea2d.oggstr"
+
+[deps]
+
+source_file="res://Audio/step/gravel3.ogg"
+dest_files=[ "res://.import/gravel3.ogg-18f8c01d83550b25102d3e307828ea2d.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

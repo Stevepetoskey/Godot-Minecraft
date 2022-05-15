@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://textures/environment/Sly3.png" type="Texture" id=1]
 [ext_resource path="res://textures/Gui/title/PixelBlock-2D.png" type="Texture" id=2]
@@ -17,6 +17,8 @@
 [ext_resource path="res://textures/Gui/world_selection.png" type="Texture" id=15]
 [ext_resource path="res://textures/Gui/demo_background.png" type="Texture" id=16]
 [ext_resource path="res://textures/Blocks/stone.png" type="Texture" id=17]
+[ext_resource path="res://Music/Menu (1).ogg" type="AudioStream" id=18]
+[ext_resource path="res://Audio/ui/click.ogg" type="AudioStream" id=19]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 8 )
@@ -744,9 +746,6 @@ texture_normal = SubResource( 4 )
 texture_pressed = SubResource( 5 )
 texture_hover = SubResource( 6 )
 texture_disabled = SubResource( 7 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Label" type="Label" parent="CanvasLayer/WorldSelect/LoadWorld/Warning2/WarnBack"]
 margin_left = 3.979
@@ -860,6 +859,14 @@ current = true
 zoom = Vector2( 0.75, 0.75 )
 script = ExtResource( 7 )
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 18 )
+
+[node name="NextSong" type="Timer" parent="."]
+
+[node name="Click" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 19 )
+
 [connection signal="pressed" from="CanvasLayer/MainScreen/Exit" to="." method="_on_Exit_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainScreen/Play" to="." method="_on_Play_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/NewWorld/Back" to="CanvasLayer/WorldSelect" method="_on_Back_pressed"]
@@ -876,3 +883,5 @@ script = ExtResource( 7 )
 [connection signal="pressed" from="CanvasLayer/WorldSelect/LoadWorld/Warning2/WarnBack" to="CanvasLayer/WorldSelect" method="_on_WarnBack_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/LoadWorld/Warning3/Ok" to="CanvasLayer/WorldSelect" method="_on_Ok_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/LoadWorld/Warning3/WarnBack" to="CanvasLayer/WorldSelect" method="_on_WarnBack_pressed"]
+[connection signal="finished" from="AudioStreamPlayer" to="." method="_on_AudioStreamPlayer_finished"]
+[connection signal="timeout" from="NextSong" to="." method="_on_NextSong_timeout"]

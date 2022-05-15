@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/anvil_land.ogg-a95ff4f587a910f624b1aa4f00fd5de1.oggstr"
+
+[deps]
+
+source_file="res://Audio/random/anvil_land.ogg"
+dest_files=[ "res://.import/anvil_land.ogg-a95ff4f587a910f624b1aa4f00fd5de1.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

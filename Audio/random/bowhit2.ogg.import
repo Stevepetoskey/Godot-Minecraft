@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/bowhit2.ogg-21e13154b5425742019c6a331633269d.oggstr"
+
+[deps]
+
+source_file="res://Audio/random/bowhit2.ogg"
+dest_files=[ "res://.import/bowhit2.ogg-21e13154b5425742019c6a331633269d.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

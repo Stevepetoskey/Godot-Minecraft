@@ -14,6 +14,8 @@ var walking = false
 var loaded = true
 var mouseIn = false
 
+var soundWait = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
@@ -32,7 +34,11 @@ func _physics_process(delta):
 	if Input.is_action_just_pressed("break") and mouseIn and position.distance_to(get_node("../../Player").position) <= 64:
 		get_node("../../Player").exhaustion += 0.1
 		take_damage(get_node("..").get_damage(),true,sign(position.x - get_node("../../Player").position.x))
-	if health <= 0:
+	if health <= 0 and !$death.playing:
+		if !$death.playing:
+			print("guh")
+			$death.play()
+		yield($death,"finished")
 		get_node("..").add_item(55,randi()%3+1,position,false)
 		queue_free()
 	if loaded:
@@ -44,6 +50,11 @@ func _physics_process(delta):
 		if is_on_wall() and is_on_floor():
 			motion.y -= JUMPSPEED
 		if abs(xMotion) > 0:
+			if !soundWait:
+				$walk.stream = load("res://Audio/mob/pig/step" + str(randi()%5+1) +".ogg")
+				$walk.play()
+				soundWait = true
+				$walkEnd.start()
 			$AnimationPlayer.play("Walk")
 			if xMotion > 0:
 				$Head.flip_h = true
@@ -76,8 +87,10 @@ func _physics_process(delta):
 		else:
 			loaded = false
 			visible = false
+		if randi()%100 == 1:
+			$AudioStreamPlayer2D.stream = load("res://Audio/mob/pig/say" + str(randi()%3+1) + ".ogg")
 
-func take_damage(dmg,knockback = false,dir = 0,power = 200):
+func take_damage(dmg,knockback = false,dir = 0,power = 100):
 	health -= dmg #get_node("..").get_damage()
 	if knockback:
 		motion.x += power * dir# * sign(position.x - get_node("../../Player").position.x) #normal 150
@@ -112,3 +125,6 @@ func _on_hitbox_mouse_entered():
 
 func _on_hitbox_mouse_exited():
 	mouseIn = false
+
+func _on_walkEnd_timeout():
+	soundWait = false

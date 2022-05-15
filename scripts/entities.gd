@@ -70,7 +70,7 @@ func remove_in_chunk(chunkX):
 		if child.name != "Spawn" and main.get_chunk(child.position.x) == chunkX:
 			child.queue_free()
 
-func add_item(id,num,pos,dropped):
+func add_item(id:int,num:int,pos,dropped):
 	if id > 0:
 		var item = load("res://assets/Item.tscn").instance()
 		item.motion.x = 64*int(dropped)

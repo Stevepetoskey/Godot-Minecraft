@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/chestopen.ogg-838d6205bc747aea5d160c8706aefabf.oggstr"
+
+[deps]
+
+source_file="res://Audio/random/chestopen.ogg"
+dest_files=[ "res://.import/chestopen.ogg-838d6205bc747aea5d160c8706aefabf.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

@@ -32,18 +32,73 @@ signal world_loaded
 
 var worldSeed = 0
 var trees = {"normal": [[0,0,5],[0,5,5],[5,5,5],[0,0,5],[0,0,0]]} #[x[y]]
-var blockData = {0:[0,-1,["none"],[0],false],1:[1,0.6,["all"],[2,1],false],2:[1,0.5,["all"],[2,1],false],3:[2,1.5,["allType"],[13,1],false],4:[3,2,["all"],[4,1],false],5:[0,0.2,["all"],[0,0],false],6:[2,3,["allType"],[15,1],false],7:[2,3,["stone","iron","diamond","gold","netherite"],[7,1],false],
-8:[3,2,["all"],[8,1],false],10:[3,3.75,["all"],[10,1],false],13:[2,2,["allType"],[13,1],false],23:[2,3.5,["allType"],[23,1],false],25:[2,5,["allType"],[25,1],false],26:[2,5,["stone","iron","diamond","gold","netherite"],[26,1],false],27:[2,3,["iron","diamond","netherite"],[34,1],false],
-41:[0,-1,["none"],[41,1],false],42:[1,0.5,["all"],[42,1],false],43:[0,0.3,["all"],[0,0],false],44:[2,0.8,["allType"],[44,1],false],45:[1,0.2,["allType"],[46,4],false],48:[1,0.6,["all"],[47,4],false],50:[2,2,["allType"],[50,1]],51:[2,2,["allType"],[51,1],false],52:[2,1.5,["allType"],[52,1],false],53:[0,0.01,["all"],[53,1],true,14],
-54:[3,0.4,["all"],[54,1],false],55:[2,5,["allType"],[55,1],true,5],35:[0,-1,["none"],[35,1],false],57:[0,0.01,["all"],[57,1],false],58:[3,2.5,["all"],[58,1],false],60:[0,-1,["none"],[41,1],false]} #[mined by (0:none,1:shovel,2:pick,3:axe),block hardness,can harvest,drops,light source, light emit]
+var block_data = {}
+var sound_data = {}
+var sound_amount = {}
 var lightData = []
 var time
 
 var breakLoc = Vector2(0,0)
 var breakp = 0
 
+class sound:
+	var step :String
+	var dig : String
+	var breakBlock : String
+	var fall : String
+	var place : String
+	
+	func _init(s,d,b,f,p):
+		step = s; dig = d; breakBlock = b; fall = f; place = p
+
+class block:
+	
+	var blockName : String
+	var blockId : int
+	var minedBy : int #0:none,1:shovel,2:pick,3:axe
+	var blockHardness : float
+	var canHarvest : Array
+	var drops : Array
+	var lightSource : bool
+	var lightEmit : int
+	var texture : String
+	var soundFiles : String
+	
+	func _init(Name,id,mined,hardness,harvestBy,drop,tex,sound,canLight = false,lightE = 0) -> void:
+		blockName = Name; blockId = id; minedBy = mined; blockHardness = hardness; canHarvest = harvestBy; drops = drop; lightSource = canLight; lightEmit = lightE; texture = tex; soundFiles = sound
+
+func get_json(file : String):
+	var data_file = File.new()
+	var doesExist = File.new()
+	if data_file.open("user://data/" + file, File.READ) != OK:
+		print("Json error: getting json file " + file)
+		return
+	var data_text = data_file.get_as_text()
+	data_file.close()
+	var data_parse = JSON.parse(data_text)
+	if data_parse.error != OK:
+		print("Json error: cannot parse json file " + file )
+		return
+	return data_parse.result
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	#Loads block data
+	var json_block_data = get_json("block_data.json")
+	for blockData in json_block_data:
+		var data = json_block_data[blockData]
+		if !data.has("light_source"):
+			block_data[int(blockData)] = block.new(data["name"],int(data["id"]),int(data["mined_by"]),data["block_hardness"],data["can_harvest"],data["drops"],data["texture"],data["sound_file_name"])
+		else:
+			block_data[int(blockData)] = block.new(data["name"],int(data["id"]),int(data["mined_by"]),data["block_hardness"],data["can_harvest"],data["drops"],data["texture"],data["sound_file_name"],data["light_source"],data["light_value"])
+	#Loads sound data
+	var json_sound_data = get_json("sound.json")
+	for soundi in json_sound_data:
+		var data = json_sound_data[soundi]
+		sound_data[soundi] = sound.new(data["step"],data["dig"],data["break"],data["fall"],data["place"])
+	#Loads number of audio files per sound
+	sound_amount = get_json("sound_num.json")
+	
 	get_node("CanvasLayer/Loading").visible = true
 	worldName = globals.worldNamePath
 	if !globals.new: #Checks if save directory exists, if not, creates a new one
@@ -339,16 +394,22 @@ func block(action,pos,z=1,test=false): #action: either get or put the block you 
 				toPlace[get_chunk(pos.x)] = [[int(action),pos,z]]
 
 func build_event(action,pos,id,z = 1):
+	var blockAtPos = block("get",pos,z)
 	if action == "break":
-		if [58].has(block("get",pos,z)):
+		if [58].has(blockAtPos): #Drops all items the container has when broken
 			var items = interactableBlockData[[get_node("cursor").position/ Vector2(16,16),z]]
 			for i in range(items[0].size()):
 				$entities.add_item(items[0][i],items[1][i],pos*Vector2(16,16),false)
-		if get_node("CanvasLayer/hotbar").can_harvest(block("get",pos,z)):
-			var drop = [blockData[block("get",pos,z)][3][0],blockData[block("get",pos,z)][3][1]]
-			if block("get",pos,z) == 5 and randi()%100 < 10:
-				drop = [57,1]
-			$entities.add_item(drop[0],drop[1],pos*Vector2(16,16),false)
+		if get_node("CanvasLayer/hotbar").can_harvest(blockAtPos):
+			var data = block_data[blockAtPos]
+			if blockAtPos == 5:
+				if randi()%100 < 10:
+					$entities.add_item(57,1,pos*Vector2(16,16),false)
+			elif data.drops.size() >= 1:
+				print("yes")
+				for i in range(data.drops.size()):
+					$entities.add_item(data.drops[i][0],int(rand_range(data.drops[i][1][0],data.drops[i][1][1]+1)),pos*Vector2(16,16),false)
+			print("no")
 		block("0",pos,z)
 	else:
 		block(str(id),pos,z)
@@ -370,5 +431,7 @@ func _exit_tree():
 		renderThread.wait_to_finish()
 
 func _on_Quit_pressed():
+	$CanvasLayer/Menu/click.play()
+	yield($CanvasLayer/Menu/click,"finished")
 	save_game()
 	get_tree().change_scene("res://scene/Menu.tscn")

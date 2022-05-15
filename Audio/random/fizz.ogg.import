@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/fizz.ogg-acdcd600abc1f7d7a4e8b430a15a69fd.oggstr"
+
+[deps]
+
+source_file="res://Audio/random/fizz.ogg"
+dest_files=[ "res://.import/fizz.ogg-acdcd600abc1f7d7a4e8b430a15a69fd.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

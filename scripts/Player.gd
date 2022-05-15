@@ -32,7 +32,7 @@ onready var main = get_node("..")
 var playerLoadPos = Vector2(0,0)
 var playerChunk = 0
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	if ready and !get_node("../CanvasLayer/Inventory").visible:
 		if Input.is_action_just_pressed("menu"):
 			get_node("../CanvasLayer/Menu").visible = !inMenu
@@ -58,11 +58,11 @@ func _physics_process(delta):
 			if Input.is_action_just_pressed("save"):
 				get_node("..").save_game()
 			if holding == $body/RightArm/holding:
-				$body/LeftArm/holding.visible = false
+				$body/LeftArm/holding.hide()
 			else:
-				$body/RightArm/holding.visible = false
+				$body/RightArm/holding.hide()
 			if get_node("../CanvasLayer/hotbar").inventory[0][get_node("../CanvasLayer/hotbar/select").selected] > 0:
-				holding.visible = true
+				holding.show()
 				holding.texture = get_node("../CanvasLayer/hotbar").textures[get_node("../CanvasLayer/hotbar").inventory[0][get_node("../CanvasLayer/hotbar/select").selected]]
 				if get_node("../CanvasLayer/hotbar").itemData.has(get_node("../CanvasLayer/hotbar").inventory[0][get_node("../CanvasLayer/hotbar/select").selected]) or get_node("../CanvasLayer/hotbar").itemDamage.has(get_node("../CanvasLayer/hotbar").inventory[0][get_node("../CanvasLayer/hotbar/select").selected]):
 					holding.scale = Vector2(1,1)
@@ -72,7 +72,7 @@ func _physics_process(delta):
 					#yes
 					holding.position = Vector2(4*sign(-2*flip+1),8)
 			else:
-				holding.visible = false
+				holding.hide()
 			if floor($Camera2D.global_position.x/16/ main.chunkSize.x) != playerChunk:
 				main.update_chunks(floor($Camera2D.global_position.x/16/ main.chunkSize.x))
 				playerChunk = floor($Camera2D.global_position.x/16/ main.chunkSize.x)
@@ -83,7 +83,7 @@ func _physics_process(delta):
 				$head.rotation = $head.global_position.angle_to_point(get_global_mouse_position()) #+ deg2rad(90)
 			else:
 				$head.rotation = $head.global_position.angle_to_point(get_global_mouse_position()) + deg2rad(180)
-			flip(get_global_mouse_position().x < global_position.x)
+			flip_textures(get_global_mouse_position().x < global_position.x)
 			if Input.is_action_pressed("sprint") and hunger > 6:
 				maxSpeed = 128
 			else:
@@ -116,10 +116,17 @@ func _physics_process(delta):
 						firstHeight = round(position.y/16.0)
 					inAir = true
 				else:
+					var blockOn = main.block("get",Vector2(int(round(position.x/16)),int(round(position.y+32)/16)))
+					#print(blockOn, ": ", Vector2(int(round(position.x/16)),int(round(position.y+32)/16)))
 					motion.y = 0
 					if inAir:
 						if firstHeight - round(position.y/16.0) < -3:
 							take_damage((firstHeight - round(position.y/16.0) + 3)*-1)
+					if !$movement.playing and motion.x != 0 and blockOn != 0:
+						var soundFile = main.sound_data[main.block_data[blockOn].soundFiles].step
+						$movement.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
+						$movement.play()
+						$walkEnd.start()
 					inAir = false
 				if Input.is_action_pressed("jump") and !inAir:
 					if maxSpeed == 128:
@@ -145,7 +152,7 @@ func _physics_process(delta):
 				motion.x = 0
 			move_and_slide(motion,Vector2(0,-1))
 
-func flip(f):
+func flip_textures(f):
 	flip = int(f)
 	holding = [$body/RightArm/holding,$body/LeftArm/holding][int(f)]
 #	$body/RightArm/holding.visible = false
@@ -158,6 +165,7 @@ func flip(f):
 	$LeftLeg.region_rect.position = Vector2(8,8+(12*int(f)))
 
 func take_damage(dmg,knockback = false,dir = 0,power = 200):
+	$hurt.play()
 	health -= dmg
 	if knockback:
 		motion.x += power * dir
@@ -238,3 +246,6 @@ func _on_Sprint_timeout():
 func _on_Node2D_world_loaded():
 	get_node("../CanvasLayer/Loading").visible = false
 	ready = true
+
+func _on_walkEnd_timeout():
+	$movement.stop()

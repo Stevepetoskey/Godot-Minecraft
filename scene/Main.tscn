@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=2]
+[gd_scene load_steps=45 format=2]
 
 [ext_resource path="res://scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://assets/Player.tscn" type="PackedScene" id=2]
@@ -11,7 +11,7 @@
 [ext_resource path="res://scripts/entities.gd" type="Script" id=9]
 [ext_resource path="res://textures/Gui/inventory.png" type="Texture" id=10]
 [ext_resource path="res://scripts/Inventory.gd" type="Script" id=11]
-[ext_resource path="res://textures/Blocks/grass_block_side.png" type="Texture" id=12]
+[ext_resource path="res://textures/Blocks/grass_block.png" type="Texture" id=12]
 [ext_resource path="res://scripts/iconCursor.gd" type="Script" id=13]
 [ext_resource path="res://fonts/Regular.tres" type="DynamicFont" id=14]
 [ext_resource path="res://textures/Gui/furnace.png" type="Texture" id=15]
@@ -31,6 +31,7 @@
 [ext_resource path="res://textures/Gui/container/shulker_box.png" type="Texture" id=29]
 [ext_resource path="res://scripts/waterSystem.gd" type="Script" id=30]
 [ext_resource path="res://scene/Sky.tscn" type="PackedScene" id=31]
+[ext_resource path="res://Audio/ui/click.ogg" type="AudioStream" id=32]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 16 )
@@ -109,6 +110,12 @@ visible = false
 visible = false
 z_index = -1
 texture = ExtResource( 21 )
+
+[node name="breaking" type="AudioStreamPlayer" parent="cursor"]
+
+[node name="breakingEnd" type="Timer" parent="cursor"]
+wait_time = 0.22
+one_shot = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -381,6 +388,9 @@ text = "Quit To Menu"
 align = 1
 valign = 1
 
+[node name="click" type="AudioStreamPlayer" parent="CanvasLayer/Menu"]
+stream = ExtResource( 32 )
+
 [node name="Loading" type="TextureRect" parent="CanvasLayer"]
 visible = false
 margin_right = 384.0
@@ -433,6 +443,7 @@ one_shot = true
 layer = -1
 
 [node name="ViewportContainer" type="ViewportContainer" parent="CanvasLayer2"]
+visible = false
 margin_right = 1920.0
 margin_bottom = 1080.0
 stretch = true
@@ -440,7 +451,7 @@ stretch = true
 [node name="Viewport" type="Viewport" parent="CanvasLayer2/ViewportContainer"]
 size = Vector2( 1920, 1080 )
 handle_input_locally = false
-render_target_update_mode = 3
+render_target_update_mode = 0
 
 [node name="Spatial" parent="CanvasLayer2/ViewportContainer/Viewport" instance=ExtResource( 31 )]
 
@@ -451,6 +462,7 @@ render_target_update_mode = 3
 [connection signal="world_loaded" from="." to="Lighting" method="_on_Node2D_world_loaded"]
 [connection signal="world_loaded" from="." to="water" method="_on_Node2D_world_loaded"]
 [connection signal="timeout" from="cursor/blockSlowdown" to="cursor" method="_on_blockSlowdown_timeout"]
+[connection signal="timeout" from="cursor/breakingEnd" to="cursor" method="_on_breakingEnd_timeout"]
 [connection signal="pressed" from="CanvasLayer/Menu/Quit" to="." method="_on_Quit_pressed"]
 [connection signal="timeout" from="Lighting/DaylightCycle" to="Lighting" method="_on_Daylight_Cycle_timeout"]
 [connection signal="timeout" from="water/Timer" to="water" method="_on_Timer_timeout"]

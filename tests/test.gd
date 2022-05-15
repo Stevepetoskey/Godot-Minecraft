@@ -51,6 +51,9 @@ func _ready():
 			else:
 				stop = true
 	print(files)
+	print("random test")
+	for i in range(20):
+		print(int(rand_range(1,3+1)))
 
 func optimal():
 	var time = OS.get_ticks_msec()
