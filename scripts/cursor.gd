@@ -85,12 +85,21 @@ func _process(_delta):
 #						print(get_node("../water").water)
 #						get_node("../water").water.erase(position/ Vector2(16,16))
 #						print(get_node("../water").water)
-					$breakingEnd.stop()
-					var soundFile = main.sound_data[main.block_data[selectedItem].soundFiles].place
-					$breaking.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
-					$breaking.play()
-					main.build_event("build",position/ Vector2(16,16),selectedItem,z)
-			elif Input.is_action_just_pressed("build"):
+					if selectedItem == 62:
+						if [0,41,60].has(main.block("get",Vector2(position.x/16,position.y/16-1),z)):
+							$breakingEnd.stop()
+							var soundFile = main.sound_data[main.block_data[selectedItem].soundFiles].place
+							$breaking.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
+							$breaking.play()
+							main.build_event("build",position/ Vector2(16,16),selectedItem,z)
+							main.build_event("build",Vector2(position.x/16,position.y/16-1),63,z)
+					else:
+						$breakingEnd.stop()
+						var soundFile = main.sound_data[main.block_data[selectedItem].soundFiles].place
+						$breaking.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
+						$breaking.play()
+						main.build_event("build",position/ Vector2(16,16),selectedItem,z)
+			elif Input.is_action_just_pressed("build"): #Interact
 #				if hotbar.itemData.has(hotbar.inventory[0][get_node("../CanvasLayer/hotbar/select").selected]) and hotbar.itemData[hotbar.inventory[0][get_node("../CanvasLayer/hotbar/select").selected]][0] == 4:
 				match main.block("get",position/ Vector2(16,16),z):
 					10:
@@ -108,6 +117,8 @@ func _process(_delta):
 						get_node("../CanvasLayer/Inventory").visible = true
 						get_node("../CanvasLayer/Inventory").currentChest = main.interactableBlockData[[position/ Vector2(16,16),z]]
 						get_node("../chunks").get_node(str(main.get_chunk(position.x/16))).get_node(str(z) + "," + str(main.chunkifyI(position.x/16)) + "," + str(position.y/16)).interact(true)
+					62:
+						get_node("../chunks").get_node(str(main.get_chunk(position.x/16))).get_node(str(z) + "," + str(main.chunkifyI(position.x/16)) + "," + str(position.y/16)).open_door()
 
 func get_chunk(xPos):
 	return int(stepify(xPos,main.chunkSize.x)/main.chunkSize.x)

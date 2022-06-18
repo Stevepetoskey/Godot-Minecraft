@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/furnace_front_on.png-aa7a5b8ba9a20b02f6b4303e2be96ec6.stex"
+path="res://.import/oak_door_bottom_closed.png-8230290428a8441df1ef59442ad63d73.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://textures/Blocks/furnace_front_on.png"
-dest_files=[ "res://.import/furnace_front_on.png-aa7a5b8ba9a20b02f6b4303e2be96ec6.stex" ]
+source_file="res://textures/Blocks/oak_door_bottom_closed.png"
+dest_files=[ "res://.import/oak_door_bottom_closed.png-8230290428a8441df1ef59442ad63d73.stex" ]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=0
-flags/filter=false
+flags/filter=true
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2
@@ -31,5 +31,5 @@ process/invert_color=false
 process/normal_map_invert_y=false
 stream=false
 size_limit=0
-detect_3d=false
+detect_3d=true
 svg/scale=1.0

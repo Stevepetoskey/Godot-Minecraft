@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=2]
+[gd_scene load_steps=46 format=2]
 
 [ext_resource path="res://scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://assets/Player.tscn" type="PackedScene" id=2]
@@ -32,6 +32,7 @@
 [ext_resource path="res://scripts/waterSystem.gd" type="Script" id=30]
 [ext_resource path="res://scene/Sky.tscn" type="PackedScene" id=31]
 [ext_resource path="res://Audio/ui/click.ogg" type="AudioStream" id=32]
+[ext_resource path="res://scripts/GUI.gd" type="Script" id=33]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 16 )
@@ -118,6 +119,7 @@ wait_time = 0.22
 one_shot = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+script = ExtResource( 33 )
 
 [node name="hotbar" type="Sprite" parent="CanvasLayer"]
 position = Vector2( 960, 1025 )
@@ -253,6 +255,7 @@ scale = Vector2( 4.5, 4.5 )
 script = ExtResource( 20 )
 
 [node name="Pos" type="Label" parent="CanvasLayer"]
+visible = false
 margin_right = 288.0
 margin_bottom = 173.0
 rect_scale = Vector2( 5, 5 )
@@ -262,6 +265,7 @@ __meta__ = {
 }
 
 [node name="FPS" type="Label" parent="CanvasLayer"]
+visible = false
 margin_left = 4.23303
 margin_top = 81.4865
 margin_right = 50.233
@@ -273,6 +277,7 @@ __meta__ = {
 }
 
 [node name="Label" type="Label" parent="CanvasLayer"]
+visible = false
 margin_left = 2.9967
 margin_top = 161.817
 margin_right = 95.9967
@@ -284,20 +289,17 @@ __meta__ = {
 }
 
 [node name="EC" type="Label" parent="CanvasLayer"]
+visible = false
 margin_left = 2.997
 margin_top = 240.0
 margin_right = 95.997
 margin_bottom = 254.0
 rect_scale = Vector2( 5, 5 )
 text = "EC: 0"
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="CanvasLayer"]
 
 [node name="Sky" type="ParallaxLayer" parent="CanvasLayer/ParallaxBackground"]
-visible = false
 motion_scale = Vector2( 0.1, 0.01 )
 motion_offset = Vector2( 0, -400 )
 motion_mirroring = Vector2( 1440, 0 )

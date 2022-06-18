@@ -15,6 +15,10 @@ var smelting = false
 var rendered = false
 var isSmelting = 0
 
+#Door vars
+var open = false
+var secondPart : Object
+
 onready var main = get_node("../../..")
 
 # Called when the node enters the scene tree for the first time.
@@ -158,3 +162,8 @@ func interact(opened):
 		$Sprite.texture = load("res://textures/Blocks/chest/normal_closed.png")
 	else:
 		$Sprite.texture = load("res://textures/Blocks/chest/normal_opened.png")
+
+func open_door():
+	if !open:
+		open = true
+		
