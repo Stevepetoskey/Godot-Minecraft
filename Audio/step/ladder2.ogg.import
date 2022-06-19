@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/ladder2.ogg-36cb3805f62befd8ea546afb3a73dc47.oggstr"
+
+[deps]
+
+source_file="res://Audio/step/ladder2.ogg"
+dest_files=[ "res://.import/ladder2.ogg-36cb3805f62befd8ea546afb3a73dc47.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

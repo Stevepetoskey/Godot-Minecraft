@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/wet_grass4.ogg-e53a9035a01dbe5186cd26bcec3c0637.oggstr"
+
+[deps]
+
+source_file="res://Audio/dig/wet_grass4.ogg"
+dest_files=[ "res://.import/wet_grass4.ogg-e53a9035a01dbe5186cd26bcec3c0637.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

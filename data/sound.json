@@ -1,0 +1,51 @@
+{
+"grass":{
+	"step": "step/grass",
+	"dig": "step/grass",
+	"break":"dig/grass",
+	"fall":"step/grass",
+	"place":"dig/grass",
+	},
+"gravel":{
+	"step": "step/gravel",
+	"dig": "step/gravel",
+	"break":"dig/gravel",
+	"fall":"step/gravel",
+	"place":"dig/gravel"
+	},
+"stone":{
+	"step": "step/stone",
+	"dig": "step/stone",
+	"break":"dig/stone",
+	"fall":"step/stone",
+	"place":"dig/stone"
+	},
+"wood":{
+	"step": "step/wood",
+	"dig": "step/wood",
+	"break":"dig/wood",
+	"fall":"step/wood",
+	"place":"dig/wood"
+	},
+"sand":{
+	"step": "step/sand",
+	"dig": "step/sand",
+	"break":"dig/sand",
+	"fall":"step/sand",
+	"place":"dig/sand"
+	},
+"glass":{
+	"step": "step/stone",
+	"dig": "step/stone",
+	"break":"random/glass",
+	"fall":"step/stone",
+	"place":"dig/stone"
+	},
+"snow":{
+	"step": "step/snow",
+	"dig": "step/snow",
+	"break":"dig/snow",
+	"fall":"step/snow",
+	"place":"dig/snow"
+	},
+}

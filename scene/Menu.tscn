@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://textures/environment/Sly3.png" type="Texture" id=1]
 [ext_resource path="res://textures/Gui/title/PixelBlock-2D.png" type="Texture" id=2]
@@ -17,6 +17,8 @@
 [ext_resource path="res://textures/Gui/world_selection.png" type="Texture" id=15]
 [ext_resource path="res://textures/Gui/demo_background.png" type="Texture" id=16]
 [ext_resource path="res://textures/Blocks/stone.png" type="Texture" id=17]
+[ext_resource path="res://Music/Menu (1).ogg" type="AudioStream" id=18]
+[ext_resource path="res://Audio/ui/click.ogg" type="AudioStream" id=19]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 8 )
@@ -268,9 +270,6 @@ visible = false
 margin_right = 40.0
 margin_bottom = 40.0
 script = ExtResource( 13 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/WorldSelect"]
 modulate = Color( 0.592157, 0.592157, 0.592157, 1 )
@@ -296,9 +295,6 @@ texture = ExtResource( 12 )
 visible = false
 margin_right = 40.0
 margin_bottom = 40.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Back" type="TextureButton" parent="CanvasLayer/WorldSelect/NewWorld"]
 margin_left = 190.968
@@ -348,27 +344,34 @@ anchor_left = 0.0238159
 anchor_top = 7.62939e-07
 anchor_right = 0.0238159
 anchor_bottom = 7.62939e-07
-margin_left = 462.307
-margin_top = 310.0
-margin_right = 1147.31
-margin_bottom = 370.0
+margin_left = 455.047
+margin_top = 288.0
+margin_right = 1140.05
+margin_bottom = 348.0
 rect_scale = Vector2( 1.3, 1.3 )
 custom_fonts/font = ExtResource( 9 )
 custom_styles/normal = SubResource( 8 )
 text = "New World"
-__meta__ = {
-"_edit_use_anchors_": false
-}
+
+[node name="Name" type="Label" parent="CanvasLayer/WorldSelect/NewWorld/LineEdit"]
+margin_left = 1.0
+margin_top = -46.0
+margin_right = 286.0
+margin_bottom = 4.0
+rect_scale = Vector2( 0.75, 0.75 )
+custom_colors/font_color = Color( 0.647059, 0.647059, 0.647059, 1 )
+custom_fonts/font = ExtResource( 9 )
+text = "World Name:"
 
 [node name="Seed" type="LineEdit" parent="CanvasLayer/WorldSelect/NewWorld"]
 anchor_left = 0.0238159
 anchor_top = 7.62939e-07
 anchor_right = 0.0238159
 anchor_bottom = 7.62939e-07
-margin_left = 462.307
-margin_top = 500.0
-margin_right = 1147.31
-margin_bottom = 560.0
+margin_left = 455.047
+margin_top = 456.0
+margin_right = 1140.05
+margin_bottom = 516.0
 rect_scale = Vector2( 1.3, 1.3 )
 custom_fonts/font = ExtResource( 9 )
 custom_styles/normal = SubResource( 8 )
@@ -377,29 +380,21 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Name" type="Label" parent="CanvasLayer/WorldSelect/NewWorld"]
-margin_left = 464.0
-margin_top = 250.0
-margin_right = 749.0
-margin_bottom = 300.0
-custom_colors/font_color = Color( 0.647059, 0.647059, 0.647059, 1 )
-custom_fonts/font = ExtResource( 9 )
-text = "World Name:"
-
-[node name="Name2" type="Label" parent="CanvasLayer/WorldSelect/NewWorld"]
-margin_left = 464.0
-margin_top = 440.0
-margin_right = 749.0
-margin_bottom = 490.0
+[node name="seed" type="Label" parent="CanvasLayer/WorldSelect/NewWorld/Seed"]
+margin_left = 0.569489
+margin_top = -46.1539
+margin_right = 285.569
+margin_bottom = 3.84613
+rect_scale = Vector2( 0.75, 0.75 )
 custom_colors/font_color = Color( 0.647059, 0.647059, 0.647059, 1 )
 custom_fonts/font = ExtResource( 9 )
 text = "Seed:"
 
 [node name="Create" type="TextureButton" parent="CanvasLayer/WorldSelect/NewWorld"]
-margin_left = 501.221
-margin_top = 677.597
-margin_right = 701.221
-margin_bottom = 697.597
+margin_left = 504.0
+margin_top = 680.0
+margin_right = 704.0
+margin_bottom = 700.0
 rect_scale = Vector2( 4, 4 )
 texture_normal = SubResource( 1 )
 texture_pressed = SubResource( 2 )
@@ -419,9 +414,32 @@ custom_constants/shadow_offset_y = 4
 custom_fonts/font = ExtResource( 9 )
 text = "Create World"
 align = 1
+
+[node name="Customize" type="TextureButton" parent="CanvasLayer/WorldSelect/NewWorld"]
+visible = false
+margin_left = 504.0
+margin_top = 576.0
+margin_right = 704.0
+margin_bottom = 596.0
+rect_scale = Vector2( 4, 4 )
+texture_normal = SubResource( 1 )
+texture_pressed = SubResource( 2 )
+texture_hover = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Label" type="Label" parent="CanvasLayer/WorldSelect/NewWorld/Customize"]
+margin_top = 3.0
+margin_right = 665.0
+margin_bottom = 53.0
+rect_scale = Vector2( 0.3, 0.3 )
+custom_colors/font_color_shadow = Color( 0.219608, 0.219608, 0.219608, 1 )
+custom_constants/shadow_offset_x = 6
+custom_constants/shadow_offset_y = 4
+custom_fonts/font = ExtResource( 9 )
+text = "Customize"
+align = 1
 
 [node name="LoadWorld" type="Control" parent="CanvasLayer/WorldSelect"]
 margin_right = 40.0
@@ -744,9 +762,6 @@ texture_normal = SubResource( 4 )
 texture_pressed = SubResource( 5 )
 texture_hover = SubResource( 6 )
 texture_disabled = SubResource( 7 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Label" type="Label" parent="CanvasLayer/WorldSelect/LoadWorld/Warning2/WarnBack"]
 margin_left = 3.979
@@ -855,15 +870,129 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="CustomizeWorld" type="Control" parent="CanvasLayer/WorldSelect"]
+visible = false
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Gamemode" type="TextureButton" parent="CanvasLayer/WorldSelect/CustomizeWorld"]
+margin_left = 504.0
+margin_top = 304.0
+margin_right = 704.0
+margin_bottom = 324.0
+rect_scale = Vector2( 4, 4 )
+texture_normal = SubResource( 1 )
+texture_pressed = SubResource( 2 )
+texture_hover = SubResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="CanvasLayer/WorldSelect/CustomizeWorld/Gamemode"]
+margin_top = 3.0
+margin_right = 665.0
+margin_bottom = 53.0
+rect_scale = Vector2( 0.3, 0.3 )
+custom_colors/font_color_shadow = Color( 0.219608, 0.219608, 0.219608, 1 )
+custom_constants/shadow_offset_x = 6
+custom_constants/shadow_offset_y = 4
+custom_fonts/font = ExtResource( 9 )
+text = "Survival"
+align = 1
+
+[node name="Name" type="Label" parent="CanvasLayer/WorldSelect/CustomizeWorld/Gamemode"]
+margin_left = 2.0
+margin_top = -16.0
+margin_right = 287.0
+margin_bottom = 34.0
+rect_scale = Vector2( 0.25, 0.25 )
+custom_colors/font_color = Color( 0.647059, 0.647059, 0.647059, 1 )
+custom_fonts/font = ExtResource( 9 )
+text = "Gamemode:"
+
+[node name="WorldType" type="TextureButton" parent="CanvasLayer/WorldSelect/CustomizeWorld"]
+margin_left = 504.0
+margin_top = 472.0
+margin_right = 704.0
+margin_bottom = 492.0
+rect_scale = Vector2( 4, 4 )
+texture_normal = SubResource( 1 )
+texture_pressed = SubResource( 2 )
+texture_hover = SubResource( 3 )
+
+[node name="Label" type="Label" parent="CanvasLayer/WorldSelect/CustomizeWorld/WorldType"]
+margin_top = 3.0
+margin_right = 665.0
+margin_bottom = 53.0
+rect_scale = Vector2( 0.3, 0.3 )
+custom_colors/font_color_shadow = Color( 0.219608, 0.219608, 0.219608, 1 )
+custom_constants/shadow_offset_x = 6
+custom_constants/shadow_offset_y = 4
+custom_fonts/font = ExtResource( 9 )
+text = "Default"
+align = 1
+
+[node name="Name" type="Label" parent="CanvasLayer/WorldSelect/CustomizeWorld/WorldType"]
+margin_left = 2.0
+margin_top = -16.0
+margin_right = 287.0
+margin_bottom = 34.0
+rect_scale = Vector2( 0.25, 0.25 )
+custom_colors/font_color = Color( 0.647059, 0.647059, 0.647059, 1 )
+custom_fonts/font = ExtResource( 9 )
+text = "World Type:"
+
+[node name="CustomizeBack" type="TextureButton" parent="CanvasLayer/WorldSelect/CustomizeWorld"]
+margin_left = 504.0
+margin_top = 680.0
+margin_right = 704.0
+margin_bottom = 700.0
+rect_scale = Vector2( 4, 4 )
+texture_normal = SubResource( 1 )
+texture_pressed = SubResource( 2 )
+texture_hover = SubResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="CanvasLayer/WorldSelect/CustomizeWorld/CustomizeBack"]
+margin_top = 3.0
+margin_right = 665.0
+margin_bottom = 53.0
+rect_scale = Vector2( 0.3, 0.3 )
+custom_colors/font_color_shadow = Color( 0.219608, 0.219608, 0.219608, 1 )
+custom_constants/shadow_offset_x = 6
+custom_constants/shadow_offset_y = 4
+custom_fonts/font = ExtResource( 9 )
+text = "Back"
+align = 1
+
+[node name="Ver" type="Label" parent="CanvasLayer"]
+margin_left = 24.0
+margin_top = 1016.0
+margin_right = 354.0
+margin_bottom = 1066.0
+custom_fonts/font = ExtResource( 9 )
+text = "Version: 0.3.0"
+
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
 zoom = Vector2( 0.75, 0.75 )
 script = ExtResource( 7 )
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 18 )
+
+[node name="NextSong" type="Timer" parent="."]
+
+[node name="Click" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 19 )
+
 [connection signal="pressed" from="CanvasLayer/MainScreen/Exit" to="." method="_on_Exit_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainScreen/Play" to="." method="_on_Play_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/NewWorld/Back" to="CanvasLayer/WorldSelect" method="_on_Back_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/NewWorld/Create" to="CanvasLayer/WorldSelect" method="_on_Create_pressed"]
+[connection signal="pressed" from="CanvasLayer/WorldSelect/NewWorld/Customize" to="CanvasLayer/WorldSelect" method="_on_Customize_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/LoadWorld/ArrowL" to="CanvasLayer/WorldSelect" method="_on_ArrowL_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/LoadWorld/ArrowR" to="CanvasLayer/WorldSelect" method="_on_ArrowR_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/LoadWorld/play" to="CanvasLayer/WorldSelect" method="_on_play_pressed"]
@@ -876,3 +1005,8 @@ script = ExtResource( 7 )
 [connection signal="pressed" from="CanvasLayer/WorldSelect/LoadWorld/Warning2/WarnBack" to="CanvasLayer/WorldSelect" method="_on_WarnBack_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/LoadWorld/Warning3/Ok" to="CanvasLayer/WorldSelect" method="_on_Ok_pressed"]
 [connection signal="pressed" from="CanvasLayer/WorldSelect/LoadWorld/Warning3/WarnBack" to="CanvasLayer/WorldSelect" method="_on_WarnBack_pressed"]
+[connection signal="pressed" from="CanvasLayer/WorldSelect/CustomizeWorld/Gamemode" to="CanvasLayer/WorldSelect" method="_on_Gamemode_pressed"]
+[connection signal="pressed" from="CanvasLayer/WorldSelect/CustomizeWorld/WorldType" to="CanvasLayer/WorldSelect" method="_on_WorldType_pressed"]
+[connection signal="pressed" from="CanvasLayer/WorldSelect/CustomizeWorld/CustomizeBack" to="CanvasLayer/WorldSelect" method="_on_CustomizeBack_pressed"]
+[connection signal="finished" from="AudioStreamPlayer" to="." method="_on_AudioStreamPlayer_finished"]
+[connection signal="timeout" from="NextSong" to="." method="_on_NextSong_timeout"]

@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/coral2.ogg-dd87e94041d49780e1ec1cfec5826be8.oggstr"
+
+[deps]
+
+source_file="res://Audio/dig/coral2.ogg"
+dest_files=[ "res://.import/coral2.ogg-dd87e94041d49780e1ec1cfec5826be8.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

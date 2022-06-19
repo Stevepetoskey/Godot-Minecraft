@@ -11,10 +11,10 @@ var guh = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var craft = [0,0,0,
-				 24,0,24,
-				 0,24,0]
-	var result = [59,1]
+	var craft = [8,8,0,
+				 8,8,0,
+				 8,8,0]
+	var result = [62,3]
 	var loc = 0
 	var orgin = Vector2(-1,-1)
 	var crafting = []
@@ -51,6 +51,9 @@ func _ready():
 			else:
 				stop = true
 	print(files)
+	print("random test")
+	for i in range(20):
+		print(int(rand_range(1,3+1)))
 
 func optimal():
 	var time = OS.get_ticks_msec()

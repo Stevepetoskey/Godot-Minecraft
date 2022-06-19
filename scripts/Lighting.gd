@@ -6,12 +6,13 @@ var lightThread = Thread.new() #The lighting thread. This is the seperate thread
 var prePlayerPos = Vector2(0,0) #The position the player was at before the thread started
 
 var lightArray = []
-var transparent = [0,5,41,43,54,58,60]
+var transparent = [0,5,41,43,54,58,60,62,63]
 var ambientLevel = 15
 var calls = []
 var callAmount = 0
 var updated = []
 var worldLoaded = false
+var playerLoaded = false
 
 var day = true
 onready var main = get_node("..")
@@ -29,14 +30,14 @@ func get_layer(pos,includeTransparent = false):
 	return 1
 
 func get_drop_off(lightPos,firstPos,value):
-	if (value == ambientLevel and transparent.has(get_node("..").block("get",firstPos,1)) and transparent.has(get_node("..").block("get",firstPos,0)) and firstPos.y < 90 and !(transparent.has(get_node("..").block("get",lightPos,1)) and transparent.has(get_node("..").block("get",lightPos,0)))) or (main.block("get",firstPos,get_layer(firstPos)) != 0 and main.blockData[main.block("get",firstPos,get_layer(firstPos))][4]):
+	if (value == ambientLevel and transparent.has(get_node("..").block("get",firstPos,1)) and transparent.has(get_node("..").block("get",firstPos,0)) and firstPos.y < 90 and !(transparent.has(get_node("..").block("get",lightPos,1)) and transparent.has(get_node("..").block("get",lightPos,0)))) or (main.block("get",firstPos,get_layer(firstPos)) != 0 and main.block_data[main.block("get",firstPos,get_layer(firstPos))].lightSource):
 		return 0
 	if transparent.has(get_node("..").block("get",lightPos,1)):
 		return 1
 	return 3
 
 func can_propigate(pos1,pos2):
-	if get_layer(pos1) == get_layer(pos2) or get_layer(pos1) == 0 or (main.block("get",pos1,get_layer(pos1)) != null and main.blockData[main.block("get",pos1,get_layer(pos1))][4]):
+	if get_layer(pos1) == get_layer(pos2) or get_layer(pos1) == 0 or (main.block("get",pos1,get_layer(pos1)) != null and main.block_data[main.block("get",pos1,get_layer(pos1))].lightSource):
 		return true
 
 #Initializes the light array based off of the dimensions stated in LightRect
@@ -53,7 +54,7 @@ func _process(delta):
 
 #Starts the calculations of the light around the player
 func render():
-	if !lightThread.is_active() and worldLoaded == true:
+	if !lightThread.is_active() and worldLoaded and playerLoaded:
 		prePlayerPos = get_node("../Player").position
 		lightThread.start(self,"prep_light",lightArray.duplicate(true),1)
 
@@ -74,12 +75,12 @@ func prep_light(data): #threadLight is what will replace the main lightArray whe
 							threadLight[x][y] = 0
 					else:
 						threadLight[x][y] = 0
-						if backBlock != null and main.blockData[backBlock][4]:
-							threadLight[x][y] = main.blockData[backBlock][5]
+						if backBlock != null and main.block_data[backBlock].lightSource:
+							threadLight[x][y] = main.block_data[backBlock].lightEmit
 				else:
 					threadLight[x][y] = 0
-					if block != null and main.blockData[block][4]:
-						threadLight[x][y] = main.blockData[block][5]
+					if block != null and main.block_data[block].lightSource:
+						threadLight[x][y] = main.block_data[block].lightEmit
 	
 	var firstLight = threadLight.duplicate(true)
 	for x in range(LightRect.x):

@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/say2.ogg-cae922d76b28a9f592ee050b834d8cdb.oggstr"
+
+[deps]
+
+source_file="res://Audio/mob/pig/say2.ogg"
+dest_files=[ "res://.import/say2.ogg-cae922d76b28a9f592ee050b834d8cdb.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

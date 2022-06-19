@@ -5,6 +5,10 @@ const FILEBUTTON = preload("res://assets/WorldSelect.tscn")
 var savePath = "user://saves/"
 var page = 0
 var worldPathSelected = null
+var gamemodes = ["Survival","Creative"]
+var gamemodeTab = 0
+var worldTypes = ["Default","Flat"]
+var worldTypeTab = 0
 
 onready var globals = get_node("/root/GlobalScript")
 
@@ -84,28 +88,36 @@ func load_icons(): #Loads the buttons for each save
 		if page > $LoadWorld/worldSelects.get_child_count()-1:
 			page = $LoadWorld/worldSelects.get_child_count()-1
 			print(page)
-		$LoadWorld/worldSelects.get_child(page).visible = true
+		$LoadWorld/worldSelects.get_child(page).show()
 		update_buttons()
 
 func update_buttons():
+	get_node("../../Click").play()
 	if $LoadWorld/worldSelects.get_child_count() > page+1:
-		$LoadWorld/ArrowR.visible = true
+		$LoadWorld/ArrowR.show()
 	else:
-		$LoadWorld/ArrowR.visible = false
+		$LoadWorld/ArrowR.hide()
 	if page > 0:
-		$LoadWorld/ArrowL.visible = true
+		$LoadWorld/ArrowL.show()
 	else:
-		$LoadWorld/ArrowL.visible = false
+		$LoadWorld/ArrowL.hide()
 
 func _on_New_World_pressed():
-	$LoadWorld.visible = false
-	$NewWorld.visible = true
+	worldTypeTab = 0
+	gamemodeTab = 0
+	get_node("../../Click").play()
+	$LoadWorld.hide()
+	$NewWorld.show()
 
 func _on_Back_pressed():
-	$NewWorld.visible = false
-	$LoadWorld.visible = true
+	get_node("../../Click").play()
+	$NewWorld.hide()
+	$LoadWorld.show()
 
 func _on_Create_pressed(): #creates new world
+	randomize()
+	get_node("../../Click").play()
+	yield(get_node("../../Click"),"finished")
 	var worldSeed = $NewWorld/Seed.text
 	var numSeed = ""
 	for i in range(worldSeed.length()):
@@ -114,33 +126,41 @@ func _on_Create_pressed(): #creates new world
 		else:
 			numSeed += worldSeed.substr(i,1)
 	numSeed = int(numSeed)
+	if worldSeed.empty():
+		numSeed = randi()
 	globals.worldSeed = numSeed
+	globals.worldType = worldTypes[worldTypeTab]
+	globals.gamemode = gamemodes[gamemodeTab]
 	globals.new_world($NewWorld/LineEdit.text)
 	get_tree().change_scene("res://scene/Main.tscn")
 
 func _on_play_pressed(): #Loads world from save
+	get_node("../../Click").play()
+	yield(get_node("../../Click"),"finished")
 	if worldPathSelected != null:
 		if !get_save(worldPathSelected).has("Ver"):
-			$LoadWorld/Warning2.visible = true
+			$LoadWorld/Warning2.show()
 		elif get_save(worldPathSelected)["Stable"] and !globals.STABLE:
-			$LoadWorld/Warning.visible = true
+			$LoadWorld/Warning.show()
 		else:
 			globals.worldNamePath = worldPathSelected
+			globals.new = false
 			get_tree().change_scene("res://scene/Main.tscn")
 
 func _on_ArrowL_pressed():
-	$LoadWorld/worldSelects.get_child(page).visible = false
+	$LoadWorld/worldSelects.get_child(page).hide()
 	page -= 1
-	$LoadWorld/worldSelects.get_child(page).visible = true
+	$LoadWorld/worldSelects.get_child(page).show()
 	update_buttons()
 
 func _on_ArrowR_pressed():
-	$LoadWorld/worldSelects.get_child(page).visible = false
+	$LoadWorld/worldSelects.get_child(page).hide()
 	page += 1
-	$LoadWorld/worldSelects.get_child(page).visible = true
+	$LoadWorld/worldSelects.get_child(page).show()
 	update_buttons()
 
 func _on_Delete_pressed():
+	get_node("../../Click").play()
 	globals.remove_recursive(savePath + worldPathSelected)
 	worldPathSelected = null
 	$LoadWorld/play.disabled = true
@@ -148,11 +168,40 @@ func _on_Delete_pressed():
 	load_icons()
 
 func _on_Ok_pressed():
+	get_node("../../Click").play()
 	globals.worldNamePath = worldPathSelected
 	get_tree().change_scene("res://scene/Main.tscn")
 
 func _on_WarnBack_pressed():
-	$LoadWorld/Warning.visible = false
+	get_node("../../Click").play()
+	$LoadWorld/Warning.hide()
+	$LoadWorld/Warning2.hide()
+	$LoadWorld/Warning3.hide()
 	worldPathSelected = null
 	$LoadWorld/play.disabled = true
 	$LoadWorld/Delete.disabled = true
+
+func _on_Customize_pressed():
+	$CustomizeWorld/Gamemode/Label.text = gamemodes[gamemodeTab]
+	$CustomizeWorld/WorldType/Label.text = worldTypes[worldTypeTab]
+	$NewWorld.hide()
+	$CustomizeWorld.show()
+
+
+func _on_CustomizeBack_pressed():
+	$CustomizeWorld.hide()
+	$NewWorld.show()
+
+func _on_Gamemode_pressed():
+	if gamemodeTab < gamemodes.size()-1:
+		gamemodeTab += 1
+	else:
+		gamemodeTab = 0
+	$CustomizeWorld/Gamemode/Label.text = gamemodes[gamemodeTab]
+
+func _on_WorldType_pressed():
+	if worldTypeTab < worldTypes.size()-1:
+		worldTypeTab += 1
+	else:
+		worldTypeTab = 0
+	$CustomizeWorld/WorldType/Label.text = worldTypes[worldTypeTab]

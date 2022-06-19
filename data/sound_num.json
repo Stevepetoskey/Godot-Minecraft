@@ -1,0 +1,15 @@
+{
+"step/grass":6,
+"dig/grass":4,
+"step/gravel":4,
+"dig/gravel":4,
+"step/stone":6,
+"dig/stone":4,
+"step/wood":6,
+"dig/wood":4,
+"step/sand":5,
+"dig/sand":4,
+"random/glass":3,
+"step/snow":4,
+"dig/snow":4
+}

@@ -44,6 +44,7 @@ var recipes = [[[[Vector2(0,0),4]],[8,4]],[[[Vector2(0,0),8],[Vector2(0,1),8]],[
 [[[Vector2(0, 0),9],[Vector2(2, 0),9],[Vector2(0, 1),9],[Vector2(1, 1),9],[Vector2(2, 1),9],[Vector2(0, 2),9],[Vector2(2, 2),9]], [54, 4]], #Ladder
 [[[Vector2(0, 0),8],[Vector2(1, 0),8],[Vector2(2, 0),8],[Vector2(0, 1),8],[Vector2(2, 1),8],[Vector2(0, 2),8],[Vector2(1, 2),8],[Vector2(2, 2),8]], [58, 1]], #Chest
 [[[Vector2(0, 0),24],[Vector2(2, 0),24],[Vector2(1, 1),24]], [59, 1]], #Bucket
+[[[Vector2(0, 0),8],[Vector2(1, 0),8],[Vector2(0, 1),8],[Vector2(1, 1),8],[Vector2(0, 2),8],[Vector2(1, 2),8]], [62, 3]], #Oak door
 ] #[[item1[pos (to orgin),id],item2,ect],[result id,result num]]
 var crafted = 0
 var made = false

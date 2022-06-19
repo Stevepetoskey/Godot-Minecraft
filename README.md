@@ -2,19 +2,19 @@
 ## Alpha 3 goals
 - More optimized rendering system (Pre 4)
 - Lighting system (Pre 4)
-- caves
+- caves (saving for alpha 4)
 - loads of new building blocks (~)
-- doors
-- add entities (Pig - Pre 8, Sheep)
-- add mobs (Zombie-pre 11, Skeleton, Creeper)
-- add bow with camera that moves with cursor to extent
+- doors (pre 14)
+- add entities (Pig - Pre 8, Sheep - Saving for Alpha 4)
+- add mobs (Zombie-pre 11, Skeleton-pre 12, Creeper)
+- add bow with camera that moves with cursor to extent (saving for alpha 4)
 - organize worlds from date modified (pre 12)
-- water
+- water (saving for alpha 4)
 - Saplings (pre 11)
-- Wheat
+- Wheat (saving for alpha 4)
 - chest (pre 11)
-- water acts like water
-- redstone (?)
+- water acts like water (saving for alpha 4)
+- redstone (release tbd)
 
 BUG THAT NEED FIXING
 - block rendering engine seems to be held together with duct tape and not as optimized as it could be
@@ -56,3 +56,11 @@ BUG THAT NEED FIXING
 - Made worlds organized from date modified
 - Water system (WIP)
 - Skeletons
+### Alpha 3 pre 13
+- Added breaking, walking, and placement sounds
+- Added menu music
+- Added clicking sounds to buttons
+- Reworked block data into json files
+- Removed water system
+### Alpha 3 pre 14
+-Added Doors

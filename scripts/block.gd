@@ -9,11 +9,16 @@ var lightEmit = 0
 var shadeRotations = [90,180,0,270] #[left,top,bottom,right]
 
 var data = {}
+var containsData = false
 var smeltable = {}
 var fuel = {}
 var smelting = false
 var rendered = false
 var isSmelting = 0
+
+#Door vars
+var open = true
+var secondPart : Object
 
 onready var main = get_node("../../..")
 
@@ -22,6 +27,13 @@ func _ready():
 	render()
 
 func render():
+	if containsData:
+		data = main.interactableBlockData[[global_position/ Vector2(16,16),z]]
+	if [62,63].has(id):
+		$CollisionShape2D.shape.extents = Vector2(3,8)
+		$CollisionShape2D.position.x = -6.5
+		open = data
+		open_door(false)
 	$Sprite.material.set_shader_param("layerShade",1)
 	main.connect("update",self,"on_update")
 	z_index = 1
@@ -31,7 +43,7 @@ func render():
 	if z == 0:
 		$Sprite.material.set_shader_param("layerShade",0.75)
 		$CollisionShape2D.disabled = true
-	$Sprite.texture = get_node("../../../CanvasLayer/hotbar").textures[id]
+	$Sprite.texture = load("res://textures/Blocks/" + main.block_data[id].texture + ".png")
 	match id:
 		5:
 			$Sprite.material.set_shader_param("color",Color(0.25,0.56,0.11,1.0))
@@ -52,6 +64,10 @@ func render():
 
 func update_Furnace():
 	if !smelting:
+#		print(main.interactableBlockData)
+#		print(global_position/ Vector2(16,16))
+#		print(data)
+#		print(id)
 		if data[2] != 0 and smeltable.has(data[0][0]):
 			$FurnaceFuel.start()
 			$FurnaceTop.start(10/22.0)
@@ -77,13 +93,14 @@ func on_update():
 		for x in range(-1,2):
 			for y in range(-1,2):
 				if abs(x) != abs(y):
-					if get_node("../../..").block("get",global_position/ Vector2(16,16) + Vector2(x,y)) > 0 and ![53,54].has(get_node("../../..").block("get",global_position/ Vector2(16,16) + Vector2(x,y))) and !has_node(str(x) + str(y)):
+					var block = get_node("../../..").block("get",global_position/ Vector2(16,16) + Vector2(x,y))
+					if block > 0 and ![53,54,62,63].has(block) and !has_node(str(x) + str(y)):
 						var sprite = Sprite.new()
 						sprite.texture = load("res://textures/Blocks/BackgroundShade.png")
 						sprite.rotation_degrees = shadeRotations[i]
 						sprite.name = str(x)+str(y)
 						add_child(sprite)
-					if get_node("../../..").block("get",global_position/ Vector2(16,16) + Vector2(x,y)) == 0 and has_node(str(x) + str(y)):
+					if block == 0 and has_node(str(x) + str(y)):
 						get_node(str(x) + str(y)).queue_free()
 					i+=1
 	if id != 0 and main.block("get",global_position/ Vector2(16,16),z) != id:
@@ -123,10 +140,8 @@ func _on_FurnaceTop_timeout():
 
 func _on_Sapling_timeout():
 	data[0] += 1
-	print(data)
 	if data[0] >= data[1]:
 		var pos = Vector2(round(global_position.x/16),round(global_position.y/16)+1)
-		print(pos)
 		var treeH = randi()%6+4
 		var canGrow = true
 		for h in range(2,treeH):
@@ -135,7 +150,6 @@ func _on_Sapling_timeout():
 		if canGrow:
 			for h in range(1,treeH):
 				main.block("4",Vector2(pos.x,pos.y-h),z)
-				print(12)
 			treeH = pos.y-treeH
 			for tX in range(5):
 				for tY in range(2,-1,-1):
@@ -157,3 +171,21 @@ func interact(opened):
 		$Sprite.texture = load("res://textures/Blocks/chest/normal_closed.png")
 	else:
 		$Sprite.texture = load("res://textures/Blocks/chest/normal_opened.png")
+
+func open_door(change = true):
+	if change:
+		open = !open
+	if open:
+		match id:
+			62:
+				$Sprite.texture = load("res://textures/Blocks/oak_door_bottom.png")
+			63:
+				$Sprite.texture = load("res://textures/Blocks/oak_door_top.png")
+		$Sprite.visible = true
+		$CollisionShape2D.disabled = true
+	else:
+		$Sprite.visible = false
+		$Door.visible = true
+		$Door.texture = load("res://textures/Blocks/oak_door_bottom_closed.png")
+		$CollisionShape2D.disabled = false
+	main.interactableBlockData[[global_position/ Vector2(16,16),z]] = open
