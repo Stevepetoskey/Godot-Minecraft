@@ -9,6 +9,7 @@ extends Node2D
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
+	$CanvasLayer/Ver.text = "Version: " + get_node("/root/GlobalScript").CURRENTVER
 	$AudioStreamPlayer.stream = load("res://Music/Menu ("+ str(randi()%4+1) + ").ogg")
 	$AudioStreamPlayer.play()
 

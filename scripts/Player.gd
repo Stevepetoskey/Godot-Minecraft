@@ -227,6 +227,7 @@ func _on_Node2D_start():
 			else:
 				x = -1
 		new = false
+		get_node("../Lighting").playerLoaded = true
 
 func _on_Hunger_timeout():
 	if hunger >= 18 and health<20:

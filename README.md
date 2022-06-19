@@ -4,10 +4,10 @@
 - Lighting system (Pre 4)
 - caves (saving for alpha 4)
 - loads of new building blocks (~)
-- doors
-- add entities (Pig - Pre 8, Sheep)
+- doors (pre 14)
+- add entities (Pig - Pre 8, Sheep - Saving for Alpha 4)
 - add mobs (Zombie-pre 11, Skeleton-pre 12, Creeper)
-- add bow with camera that moves with cursor to extent
+- add bow with camera that moves with cursor to extent (saving for alpha 4)
 - organize worlds from date modified (pre 12)
 - water (saving for alpha 4)
 - Saplings (pre 11)
@@ -62,3 +62,5 @@ BUG THAT NEED FIXING
 - Added clicking sounds to buttons
 - Reworked block data into json files
 - Removed water system
+### Alpha 3 pre 14
+-Added Doors

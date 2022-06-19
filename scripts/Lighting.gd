@@ -6,12 +6,13 @@ var lightThread = Thread.new() #The lighting thread. This is the seperate thread
 var prePlayerPos = Vector2(0,0) #The position the player was at before the thread started
 
 var lightArray = []
-var transparent = [0,5,41,43,54,58,60]
+var transparent = [0,5,41,43,54,58,60,62,63]
 var ambientLevel = 15
 var calls = []
 var callAmount = 0
 var updated = []
 var worldLoaded = false
+var playerLoaded = false
 
 var day = true
 onready var main = get_node("..")
@@ -53,7 +54,7 @@ func _process(delta):
 
 #Starts the calculations of the light around the player
 func render():
-	if !lightThread.is_active() and worldLoaded == true:
+	if !lightThread.is_active() and worldLoaded and playerLoaded:
 		prePlayerPos = get_node("../Player").position
 		lightThread.start(self,"prep_light",lightArray.duplicate(true),1)
 

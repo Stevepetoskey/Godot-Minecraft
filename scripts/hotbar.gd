@@ -71,8 +71,6 @@ func check_time_to_break(block):
 	var multiplier = 1
 	if blockStats.minedBy == itemStats[0]:
 		multiplier = toolMultiplier[itemStats[1]]
-	print(blockStats.blockHardness)
-	print(blockStats.minedBy)
 	var damage = multiplier/ float(blockStats.blockHardness)
 	if (blockStats.minedBy == itemStats[0] and (blockStats.canHarvest.has(itemStats[1]) or blockStats.canHarvest.has("allType"))) or blockStats.canHarvest.has("all"):
 		damage /= 30

@@ -5,6 +5,10 @@ const FILEBUTTON = preload("res://assets/WorldSelect.tscn")
 var savePath = "user://saves/"
 var page = 0
 var worldPathSelected = null
+var gamemodes = ["Survival","Creative"]
+var gamemodeTab = 0
+var worldTypes = ["Default","Flat"]
+var worldTypeTab = 0
 
 onready var globals = get_node("/root/GlobalScript")
 
@@ -99,6 +103,8 @@ func update_buttons():
 		$LoadWorld/ArrowL.hide()
 
 func _on_New_World_pressed():
+	worldTypeTab = 0
+	gamemodeTab = 0
 	get_node("../../Click").play()
 	$LoadWorld.hide()
 	$NewWorld.show()
@@ -109,6 +115,7 @@ func _on_Back_pressed():
 	$LoadWorld.show()
 
 func _on_Create_pressed(): #creates new world
+	randomize()
 	get_node("../../Click").play()
 	yield(get_node("../../Click"),"finished")
 	var worldSeed = $NewWorld/Seed.text
@@ -119,7 +126,11 @@ func _on_Create_pressed(): #creates new world
 		else:
 			numSeed += worldSeed.substr(i,1)
 	numSeed = int(numSeed)
+	if worldSeed.empty():
+		numSeed = randi()
 	globals.worldSeed = numSeed
+	globals.worldType = worldTypes[worldTypeTab]
+	globals.gamemode = gamemodes[gamemodeTab]
 	globals.new_world($NewWorld/LineEdit.text)
 	get_tree().change_scene("res://scene/Main.tscn")
 
@@ -133,6 +144,7 @@ func _on_play_pressed(): #Loads world from save
 			$LoadWorld/Warning.show()
 		else:
 			globals.worldNamePath = worldPathSelected
+			globals.new = false
 			get_tree().change_scene("res://scene/Main.tscn")
 
 func _on_ArrowL_pressed():
@@ -168,3 +180,28 @@ func _on_WarnBack_pressed():
 	worldPathSelected = null
 	$LoadWorld/play.disabled = true
 	$LoadWorld/Delete.disabled = true
+
+func _on_Customize_pressed():
+	$CustomizeWorld/Gamemode/Label.text = gamemodes[gamemodeTab]
+	$CustomizeWorld/WorldType/Label.text = worldTypes[worldTypeTab]
+	$NewWorld.hide()
+	$CustomizeWorld.show()
+
+
+func _on_CustomizeBack_pressed():
+	$CustomizeWorld.hide()
+	$NewWorld.show()
+
+func _on_Gamemode_pressed():
+	if gamemodeTab < gamemodes.size()-1:
+		gamemodeTab += 1
+	else:
+		gamemodeTab = 0
+	$CustomizeWorld/Gamemode/Label.text = gamemodes[gamemodeTab]
+
+func _on_WorldType_pressed():
+	if worldTypeTab < worldTypes.size()-1:
+		worldTypeTab += 1
+	else:
+		worldTypeTab = 0
+	$CustomizeWorld/WorldType/Label.text = worldTypes[worldTypeTab]

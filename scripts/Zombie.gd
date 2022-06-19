@@ -147,7 +147,6 @@ func _on_hitbox_mouse_exited():
 	mouseIn = false
 
 func _on_See_timeout():
-	print(12)
 	seePlayer = false
 
 func _on_hitbox_body_entered(body):

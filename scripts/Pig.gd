@@ -36,7 +36,6 @@ func _physics_process(delta):
 		take_damage(get_node("..").get_damage(),true,sign(position.x - get_node("../../Player").position.x))
 	if health <= 0 and !$death.playing:
 		if !$death.playing:
-			print("guh")
 			$death.play()
 		yield($death,"finished")
 		get_node("..").add_item(55,randi()%3+1,position,false)

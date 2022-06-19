@@ -43,12 +43,13 @@ func _process(_delta):
 				$breakingEnd.stop()
 				$destroy.visible = false
 			if Input.is_action_pressed("break") and main.block("get",position/ Vector2(16,16),z) > 0:
+				var currentBlock = main.block("get",position/ Vector2(16,16),z)
 				if !$breaking.playing:
-					var soundFile = main.sound_data[main.block_data[main.block("get",position/ Vector2(16,16),z)].soundFiles].dig
+					var soundFile = main.sound_data[main.block_data[currentBlock].soundFiles].dig
 					$breaking.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
 					$breaking.play()
 					$breakingEnd.start()
-				if !unbreakable.has(main.block("get",position/ Vector2(16,16),z)) and main.block_data[main.block("get",position/ Vector2(16,16),z)].blockHardness != -1 and wait == false:
+				if !unbreakable.has(currentBlock) and main.block_data[currentBlock].blockHardness != -1 and wait == false:
 					breakLoc = position
 					breakZ = z
 					stage += 1
@@ -57,10 +58,18 @@ func _process(_delta):
 					$destroy.visible = true
 					if stage >= 9:
 						$breakingEnd.stop()
-						var soundFile = main.sound_data[main.block_data[main.block("get",position/ Vector2(16,16),z)].soundFiles].breakBlock
+						var soundFile = main.sound_data[main.block_data[currentBlock].soundFiles].breakBlock
 						$breaking.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
 						$breaking.play()
-						main.build_event("break",position/ Vector2(16,16),0,z)
+						match currentBlock:
+							62:
+								main.build_event("break",position/ Vector2(16,16),0,z)
+								main.build_event("break",position/ Vector2(16,16)-Vector2(0,1),0,z,false)
+							63:
+								main.build_event("break",position/ Vector2(16,16),0,z)
+								main.build_event("break",position/ Vector2(16,16)+Vector2(0,1),0,z,false)
+							_:
+								main.build_event("break",position/ Vector2(16,16),0,z)
 						get_node("../Player").exhaustion += 0.005
 						$destroy.visible = false
 					wait = true
@@ -80,7 +89,7 @@ func _process(_delta):
 						saturation = player.hunger
 					player.saturation += saturation
 					hotbar.remove_from_inventory(get_node("../CanvasLayer/hotbar/select").selected,1)
-				elif !hotbar.items.has(selectedItem): #Place block
+				elif !hotbar.items.has(selectedItem) and selectedItem != 0: #Place block
 #					if main.block("get",position/ Vector2(16,16),z) == 41:
 #						print(get_node("../water").water)
 #						get_node("../water").water.erase(position/ Vector2(16,16))
@@ -92,7 +101,7 @@ func _process(_delta):
 							$breaking.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
 							$breaking.play()
 							main.build_event("build",position/ Vector2(16,16),selectedItem,z)
-							main.build_event("build",Vector2(position.x/16,position.y/16-1),63,z)
+							main.build_event("build",Vector2(position.x/16,position.y/16-1),63,z,false)
 					else:
 						$breakingEnd.stop()
 						var soundFile = main.sound_data[main.block_data[selectedItem].soundFiles].place
@@ -119,6 +128,10 @@ func _process(_delta):
 						get_node("../chunks").get_node(str(main.get_chunk(position.x/16))).get_node(str(z) + "," + str(main.chunkifyI(position.x/16)) + "," + str(position.y/16)).interact(true)
 					62:
 						get_node("../chunks").get_node(str(main.get_chunk(position.x/16))).get_node(str(z) + "," + str(main.chunkifyI(position.x/16)) + "," + str(position.y/16)).open_door()
+						get_node("../chunks").get_node(str(main.get_chunk(position.x/16))).get_node(str(z) + "," + str(main.chunkifyI(position.x/16)) + "," + str(position.y/16-1)).open_door()
+					63:
+						get_node("../chunks").get_node(str(main.get_chunk(position.x/16))).get_node(str(z) + "," + str(main.chunkifyI(position.x/16)) + "," + str(position.y/16)).open_door()
+						get_node("../chunks").get_node(str(main.get_chunk(position.x/16))).get_node(str(z) + "," + str(main.chunkifyI(position.x/16)) + "," + str(position.y/16+1)).open_door()
 
 func get_chunk(xPos):
 	return int(stepify(xPos,main.chunkSize.x)/main.chunkSize.x)
