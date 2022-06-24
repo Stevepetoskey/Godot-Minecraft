@@ -34,7 +34,6 @@ func render():
 		$CollisionShape2D.position.x = -6.5
 		open = data
 		open_door(false)
-	$Sprite.material.set_shader_param("layerShade",1)
 	main.connect("update",self,"on_update")
 	z_index = 1
 	if z < 1:
@@ -54,12 +53,16 @@ func render():
 			update_Furnace()
 		41,53:
 			$CollisionShape2D.disabled = true
-		54:
+		54,67,71:
 			$CollisionShape2D.disabled = true
 			$BlockCollide/CollisionShape2D.disabled = false
 		57:
 			$CollisionShape2D.disabled = true
 			$Sapling.start()
+		66:
+			$Sprite.material.set_shader_param("color",Color(0.36,0.83,0.16,1.0))
+		70:
+			$Sprite.material.set_shader_param("color",Color(0.12,0.36,0.17,1.0))
 	rendered = true
 
 func update_Furnace():
@@ -94,7 +97,7 @@ func on_update():
 			for y in range(-1,2):
 				if abs(x) != abs(y):
 					var block = get_node("../../..").block("get",global_position/ Vector2(16,16) + Vector2(x,y))
-					if block > 0 and ![53,54,62,63].has(block) and !has_node(str(x) + str(y)):
+					if block != null and block > 0 and ![53,54,62,63].has(block) and !has_node(str(x) + str(y)):
 						var sprite = Sprite.new()
 						sprite.texture = load("res://textures/Blocks/BackgroundShade.png")
 						sprite.rotation_degrees = shadeRotations[i]
@@ -142,21 +145,34 @@ func _on_Sapling_timeout():
 	data[0] += 1
 	if data[0] >= data[1]:
 		var pos = Vector2(round(global_position.x/16),round(global_position.y/16)+1)
-		var treeH = randi()%6+4
+		var treeH = int(rand_range(4,6))
+		var logType = "4"
+		var treeType = "normal"
+		match id:
+			67:
+				logType = "64"
+				treeType = "birch"
+				treeH = int(rand_range(4,10))
+			71:
+				logType = "68"
+				treeType = "spruce"
+				if randi()%2 == 1:
+					treeType = "spruce2"
+				treeH = int(rand_range(4,10))
 		var canGrow = true
 		for h in range(2,treeH):
 			if main.block("get",Vector2(pos.x,pos.y-h),z) != 0:
 				canGrow = false
 		if canGrow:
 			for h in range(1,treeH):
-				main.block("4",Vector2(pos.x,pos.y-h),z)
+				main.block(logType,Vector2(pos.x,pos.y-h),z)
 			treeH = pos.y-treeH
 			for tX in range(5):
-				for tY in range(2,-1,-1):
-					if main.trees["normal"][tX][tY] > 1 and main.block("get",Vector2(pos.x+(tX-2),tY+treeH),z) == 0:
-						main.block("5",Vector2(pos.x+(tX-2),tY+treeH),z)
-					if z != 1 and main.trees["normal"][tX][tY] > 1 and main.block("get",Vector2(pos.x+(tX-2),tY+treeH),1) == 0:
-						main.block("5",Vector2(pos.x+(tX-2),tY+treeH),1)
+				for tY in range(main.trees[treeType][tX].size(),-1,-1):
+					if main.trees[treeType][tX][tY] > 1 and main.block("get",Vector2(pos.x+(tX-2),tY+treeH),z) == 0:
+						main.block(str(main.trees[treeType][tX][tY]),Vector2(pos.x+(tX-2),tY+treeH),z)
+					if z != 1 and main.trees[treeType][tX][tY] > 1 and main.block("get",Vector2(pos.x+(tX-2),tY+treeH),1) == 0:
+						main.block(main.trees[treeType][tX][tY],Vector2(pos.x+(tX-2),tY+treeH),1)
 			$Sapling.stop()
 			for i in range(-1,2):
 				main.load_chunk(main.get_chunk(pos.x)+i)

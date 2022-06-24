@@ -1,13 +1,21 @@
 extends Node2D
 
 const chunkSize = Vector2(16,128)
-const WATERLEVEL = 85
+const WATERLEVEL = 75
 const LOADRECT = Vector2(16,11) #Normal (14,9)
 const BLOCK = preload("res://assets/block.tscn")
 const BLOCKSHADER = preload("res://shaders/block.tres")
 const WATERSHADER = preload("res://shaders/Water.tres")
 const WATER = preload("res://assets/Water.tscn")
-const INTERACTABLE_BLOCK = [23,57,62,63]
+const INTERACTABLE_BLOCK = [23,57,62,63,67]
+const BIOME_TYPES = {
+	"Plains":{"id":0,"layers":[[1,[1,1]],[2,[2,3]]],"trees":["normal","birch"]},
+	"Forest":{"id":1,"layers":[[1,[1,1]],[2,[2,3]]],"trees":["normal","birch"]},
+	"Desert":{"id":2,"layers":[[42,[1,3]],[44,[2,3]]],"trees":[]},
+	"Frozen Desert":{"id":3,"layers":[[45,[1,1]],[2,[2,3]]],"trees":[]},
+	"Tundra":{"id":4,"layers":[[45,[1,1]],[2,[2,3]]],"trees":["spruce","spruce2"]},
+	"Frozen Forest":{"id":5,"layers":[[2,[3,4]]],"trees":["spruce","spruce2"]},
+	}
 
 var chestData = [[],[]]
 var newData = {"Entity":[],"Player":[Vector2(0,0),20,600,Vector2(0,0),false,0,true]}
@@ -17,9 +25,10 @@ var toPlace = {} #ChunkX: [[block id, loc]]
 var interactableBlockData = {}
 var renderThread = Thread.new()
 var updating = false
-var noise = OpenSimplexNoise.new()
-var temps = OpenSimplexNoise.new()
-var cave = OpenSimplexNoise.new()
+export var noise : OpenSimplexNoise
+export var temps : OpenSimplexNoise
+export var precip : OpenSimplexNoise
+export var cave : OpenSimplexNoise
 var path = "user://saves/"
 var dataPath = "res://data/"
 var worldName = "newWorld"
@@ -34,7 +43,7 @@ signal world_loaded
 
 var worldSeed = 0
 var worldType = "Default"
-var trees = {"normal": [[0,0,5],[0,5,5],[5,5,5],[0,0,5],[0,0,0]]} #[x[y]]
+var trees = {"normal": [[0,0,5],[0,5,5],[5,5,5],[0,0,5],[0,0,0]],"birch": [[0,0,66],[0,66,66],[66,66,66],[0,0,66],[0,0,0]],"spruce": [[0,0,0],[0,70,70],[70,70,70],[0,70,70],[0,0,0]],"spruce2": [[0,0,70,0,70],[0,70,70,70,70],[70,70,70,70,70],[0,70,70,70,70],[0,0,70,0,70]]} #[x[y]]
 var block_data = {}
 var sound_data = {}
 var sound_amount = {}
@@ -143,11 +152,10 @@ func _ready():
 		chestData[0].append(0)
 		chestData[1].append(0)
 	seed(worldSeed)
-	noise.seed = worldSeed
-	noise.period = 256
+	cave.seed = worldSeed
 	noise.seed = randi()
-	noise.lacunarity = 5.0
 	temps.seed = randi()
+	precip.seed = randi()
 	update_chunks(player.playerChunk)
 	if globals.new:
 		save_game()
@@ -210,47 +218,67 @@ func create_chunk(chunkX):
 				chunk[x].append(0)
 		match worldType:
 			"Default":
+				var lastTree = -1
 				for x in range(chunkSize.x):
+					var height = round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+40
+					var biome = get_biome(x+(chunkX*chunkSize.x))
+					var heights = [height+int(rand_range(biome["layers"][0][1][0],biome["layers"][0][1][1]+1))]
+					for i in range(1,biome["layers"].size()):
+						heights.append(heights[i-1]+int(rand_range(biome["layers"][i][1][0],biome["layers"][i][1][1]+1)))
 					for y in range(chunkSize.y):
-						var height = round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+50
-						var biome = get_biome(x+(chunkX*chunkSize.x))
 						if y < height and y > WATERLEVEL:
 							chunk[x][y] = 41
 						if y >= height:
-							if y > height+randi()%3+1:
+							var block = -1
+							for y2 in range(heights.size()):
+								if y < heights[y2]:
+									block = biome["layers"][y2][0]
+									break
+							if block == -1:
 								chunk[x][y] = 3
 							else:
-								if y > height or (y==height and y >= WATERLEVEL+2):
-									chunk[x][y] = [2,42,2][biome]
-								else:
-									if randi()%10 == 1 and biome == 0:
-										var treeH = randi()%6+4
-										for h in range(1,treeH):
-											block("4",Vector2(chunkX*chunkSize.x+x,y-h),0)
-										treeH = y-treeH
-										for tX in range(5):
-											for tY in range(2,-1,-1):
-												if trees["normal"][tX][tY] > 1 and block("get",Vector2(chunkX*chunkSize.x+x+(tX-2),tY+treeH)) == 0:
-													block("5",Vector2(chunkX*chunkSize.x+x+(tX-2),tY+treeH))
-									chunk[x][y] = [1,42,45][biome]
+								chunk[x][y] = block
+							if y == height and y < WATERLEVEL:
+								if (x-lastTree > 1 or lastTree == -1) and randi()%2 == 1 and cave.get_noise_3d(x+(chunkX*chunkSize.x),y,0) < 0.21 and [1,5].has(biome["id"]):
+									lastTree = x
+									var treeH = int(rand_range(4,6))
+									var treeType = "normal"
+									var logType = 4
+									if biome["id"] == 1 and randi()%4 == 1:
+										treeType = "birch"
+										logType = 64
+										treeH = int(rand_range(4,10))
+									elif biome["id"] == 5:
+										treeType = "spruce"
+										if randi() % 2 == 1:
+											treeType = "spruce2"
+										logType = 68
+										treeH = int(rand_range(6,10))
+									for h in range(1,treeH):
+										block(str(logType),Vector2(chunkX*chunkSize.x+x,y-h),0)
+									treeH = y-treeH
+									for tX in range(5):
+										for tY in range(trees[treeType][tX].size()-1,-1,-1):
+											if trees[treeType][tX][tY] > 1 and block("get",Vector2(chunkX*chunkSize.x+x+(tX-2),tY+treeH)) == 0:
+												block(str(trees[treeType][tX][tY]),Vector2(chunkX*chunkSize.x+x+(tX-2),tY+treeH))
 				#yield(get_tree().create_timer(0.01), "timeout")
 				for x in range(chunkSize.x):
-					var height = round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+50
+					var height = round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+40
 					for y in range(chunkSize.y):
-						if y > WATERLEVEL+3 and y > height and y <= height + 3 and randi()%10 == 1:
+						if y > WATERLEVEL+3 and y > height and y <= height + 3 and randi()%5 == 1:
 							for x2 in range(x-5,x+5):
 								for y2 in range(y-5,y+5):
-									if randi() % (int(abs(x2-x)+abs(y2-y))+1) == 1:
-										if [1,2].has(block("get",Vector2(chunkX*chunkSize.x+x2,y2))):
-											block("42",Vector2(chunkX*chunkSize.x+x2,y2),1)
-										elif [3].has(block("get",Vector2(chunkX*chunkSize.x+x2,y2))):
-											block("44",Vector2(chunkX*chunkSize.x+x2,y2))
-						if y > WATERLEVEL+3 and y > height and y <= height + 3 and randi()%20 == 1:
+									if randi() % (int(abs(x2-x)+abs(y2-y))+1) <= 1.5:
+										if [3].has(block("get",Vector2(chunkX*chunkSize.x+x2,y2))):
+											block("44",Vector2(chunkX*chunkSize.x+x2,y2),1)
+										elif [1,2,45].has(block("get",Vector2(chunkX*chunkSize.x+x2,y2))):
+											block("42",Vector2(chunkX*chunkSize.x+x2,y2))
+						if y > WATERLEVEL+3 and y > height and y <= height + 3 and randi()%30 == 1:
 							for x2 in range(x-5,x+5):
 								for y2 in range(y-5,y+5):
-									if randi() % (int(abs(x2-x)+abs(y2-y))+1) == 1:
-										if [1,2].has(block("get",Vector2(chunkX*chunkSize.x+x2,y2))):
-											block("48",Vector2(chunkX*chunkSize.x+x2,y2),1)
+									if randi() % (int(abs(x2-x)+abs(y2-y))+1) <= 1.5 and [1,2,45,42].has(block("get",Vector2(chunkX*chunkSize.x+x2,y2))):
+#										if [1,2].has(block("get",Vector2(chunkX*chunkSize.x+x2,y2))):
+										block("48",Vector2(chunkX*chunkSize.x+x2,y2),1)
 						if y > 62 and randi()%100 == 1:
 							for x2 in range(x-3,x+3):
 								for y2 in range(y-1,y+2):
@@ -278,6 +306,12 @@ func create_chunk(chunkX):
 						elif y == chunkSize.y-4:
 							chunk[x][y] = 1
 		chunks[chunkX][0] = chunks[chunkX][1].duplicate(true)
+		for x in range(chunkSize.x):
+			for y in range(chunkSize.y):
+				if cave.get_noise_3d(x+(chunkX*chunkSize.x),y,0) > 0.21 and chunks[chunkX][1][x][y] != 35 and y >= round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+50:
+					chunks[chunkX][1][x][y] = 0
+				if cave.get_noise_3d(x+(chunkX*chunkSize.x),y,4) > 0.21 and chunks[chunkX][0][x][y] != 35 and y >= round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+50:
+					chunks[chunkX][0][x][y] = 0
 		if toPlace.has(chunkX):
 			for i in range(toPlace[chunkX].size()):
 				block(str(toPlace[chunkX][i][0]),toPlace[chunkX][i][1],toPlace[chunkX][i][2])
@@ -288,12 +322,21 @@ func create_chunk(chunkX):
 
 func get_biome(pos):
 	var temp = temps.get_noise_1d(pos)
-	if temp < -0.25:
-		return 2
-	if temp > 0.25:
-		return 1
-	else:
-		return 0
+	var precipitation = precip.get_noise_1d(pos)
+	if temp < 0:
+		if precipitation > 0.10:
+			return BIOME_TYPES["Frozen Forest"]
+		elif precipitation < -0.10:
+			return BIOME_TYPES["Frozen Desert"]
+		else:
+			return BIOME_TYPES["Tundra"]
+	if temp > 0:
+		if precipitation > 0.10:
+			return BIOME_TYPES["Forest"]
+		elif precipitation < -0.10:
+			return BIOME_TYPES["Desert"]
+		else:
+			return BIOME_TYPES["Plains"]
 
 # --- Block rendering ---
 # Each block is named for identification as ("id,x,y")
@@ -423,12 +466,20 @@ func build_event(action,pos,id,z = 1,itemAction = true):
 				$entities.add_item(items[0][i],items[1][i],pos*Vector2(16,16),false)
 		if get_node("CanvasLayer/hotbar").can_harvest(blockAtPos):
 			var data = block_data[blockAtPos]
-			if blockAtPos == 5:
-				if randi()%100 < 10:
-					$entities.add_item(57,1,pos*Vector2(16,16),false)
-			elif data.drops.size() >= 1 and itemAction:
-				for i in range(data.drops.size()):
-					$entities.add_item(data.drops[i][0],int(rand_range(data.drops[i][1][0],data.drops[i][1][1]+1)),pos*Vector2(16,16),false)
+			match blockAtPos:
+				5:
+					if randi()%100 < 10:
+						$entities.add_item(57,1,pos*Vector2(16,16),false)
+				66:
+					if randi()%100 < 10:
+						$entities.add_item(67,1,pos*Vector2(16,16),false)
+				70:
+					if randi()%100 < 10:
+						$entities.add_item(71,1,pos*Vector2(16,16),false)
+				_:
+					if data.drops.size() >= 1 and itemAction:
+						for i in range(data.drops.size()):
+							$entities.add_item(data.drops[i][0],int(rand_range(data.drops[i][1][0],data.drops[i][1][1]+1)),pos*Vector2(16,16),false)
 		block("0",pos,z)
 	else:
 		block(str(id),pos,z)
@@ -441,6 +492,8 @@ func build_event(action,pos,id,z = 1,itemAction = true):
 				interactableBlockData[[pos,z]] = chestData.duplicate(true)
 			62,63:
 				interactableBlockData[[pos,z]] = false
+			67:
+				interactableBlockData[[pos,z]] = [0,round(rand_range(120,600))]
 		if itemAction:
 			$CanvasLayer/hotbar.remove_from_inventory($CanvasLayer/hotbar/select.selected,1)
 		if action == "41":

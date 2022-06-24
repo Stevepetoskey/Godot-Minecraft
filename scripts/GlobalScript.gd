@@ -1,7 +1,7 @@
 extends Node
 
-const CURRENTVER = "0.3.0"
-const STABLE = true
+const CURRENTVER = "0.4.0 pre 1"
+const STABLE = false
 
 var savegame = File.new() #file
 var save_path = "user://saves/" #place of the file

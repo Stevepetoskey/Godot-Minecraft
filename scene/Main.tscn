@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=2]
+[gd_scene load_steps=50 format=2]
 
 [ext_resource path="res://scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://assets/Player.tscn" type="PackedScene" id=2]
@@ -33,6 +33,26 @@
 [ext_resource path="res://scene/Sky.tscn" type="PackedScene" id=31]
 [ext_resource path="res://Audio/ui/click.ogg" type="AudioStream" id=32]
 [ext_resource path="res://scripts/GUI.gd" type="Script" id=33]
+
+[sub_resource type="OpenSimplexNoise" id=14]
+octaves = 4
+period = 87.0
+persistence = 0.767
+lacunarity = 1.88
+
+[sub_resource type="OpenSimplexNoise" id=15]
+period = 131.8
+
+[sub_resource type="OpenSimplexNoise" id=16]
+octaves = 4
+period = 133.6
+persistence = 0.492
+
+[sub_resource type="OpenSimplexNoise" id=13]
+octaves = 4
+period = 15.0
+persistence = 0.185
+lacunarity = 3.54
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 16 )
@@ -89,6 +109,10 @@ region = Rect2( 0, 86, 200, 20 )
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
+noise = SubResource( 14 )
+temps = SubResource( 15 )
+precip = SubResource( 16 )
+cave = SubResource( 13 )
 
 [node name="chunks" type="Node2D" parent="."]
 

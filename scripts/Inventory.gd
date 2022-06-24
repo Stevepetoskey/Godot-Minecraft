@@ -1,17 +1,21 @@
 extends Sprite
 
+const ALL_PLANKS = -1
+const PLANK_TYPES = [65,8,69]
+
 var holdingItem = false
 var rightDown = false
 var spaceUsed = []
-var recipes = [[[[Vector2(0,0),4]],[8,4]],[[[Vector2(0,0),8],[Vector2(0,1),8]],[9,4]],
-[[[Vector2(0,0),8],[Vector2(1,0),8],[Vector2(0,1),8],[Vector2(1,1),8]],[10,1]],
-[[[Vector2(0, 0), 8], [Vector2(1, 0), 8], [Vector2(2, 0), 8], [Vector2(1, 1), 9], [Vector2(1, 2), 9]],[11,1]], #Wood tools
-[[[Vector2(0, 0), 8], [Vector2(1, 0), 8], [Vector2(0, 1), 8], [Vector2(1, 1), 9], [Vector2(1, 2), 9]],[12,1]],
-[[[Vector2(0, 0), 8], [Vector2(1, 0), 8], [Vector2(0, 1), 9], [Vector2(1, 1), 8], [Vector2(0, 2), 9]],[12,1]],
-[[[Vector2(0, 0), 8], [Vector2(0, 1), 9], [Vector2(0, 2), 9]], [14, 1]],
-[[[Vector2(0, 0), 8], [Vector2(0, 1), 8], [Vector2(0, 2), 9]], [16, 1]],
-[[[Vector2(0, 0), 8], [Vector2(1, 0), 8], [Vector2(1, 1), 9], [Vector2(1, 2), 9]], [17, 1]],
-[[[Vector2(0, 0), 8], [Vector2(1, 0), 8], [Vector2(0, 1), 9], [Vector2(0, 2), 9]], [17, 1]],
+var recipes = [[[[Vector2(0,0),4]],[8,4]], #Oak log
+[[[Vector2(0,0),-1],[Vector2(0,1),-1]],[9,4]],
+[[[Vector2(0,0),-1],[Vector2(1,0),-1],[Vector2(0,1),-1],[Vector2(1,1),-1]],[10,1]], #Crafting table
+[[[Vector2(0, 0), -1], [Vector2(1, 0), -1], [Vector2(2, 0), -1], [Vector2(1, 1), 9], [Vector2(1, 2), 9]],[11,1]], #Wood tools
+[[[Vector2(0, 0), -1], [Vector2(1, 0), -1], [Vector2(0, 1), -1], [Vector2(1, 1), 9], [Vector2(1, 2), 9]],[12,1]],
+[[[Vector2(0, 0), -1], [Vector2(1, 0), -1], [Vector2(0, 1), 9], [Vector2(1, 1), -1], [Vector2(0, 2), 9]],[12,1]],
+[[[Vector2(0, 0), -1], [Vector2(0, 1), 9], [Vector2(0, 2), 9]], [14, 1]],
+[[[Vector2(0, 0), -1], [Vector2(0, 1), -1], [Vector2(0, 2), 9]], [16, 1]],
+[[[Vector2(0, 0), -1], [Vector2(1, 0), -1], [Vector2(1, 1), 9], [Vector2(1, 2), 9]], [17, 1]],
+[[[Vector2(0, 0), -1], [Vector2(1, 0), -1], [Vector2(0, 1), 9], [Vector2(0, 2), 9]], [17, 1]],
 [[[Vector2(0, 0), 13], [Vector2(1, 0), 13], [Vector2(2, 0), 13], [Vector2(1, 1), 9], [Vector2(1, 2), 9]],[18,1]], #Stone tools
 [[[Vector2(0, 0), 13], [Vector2(1, 0), 13], [Vector2(0, 1), 13], [Vector2(1, 1), 9], [Vector2(1, 2), 9]],[19,1]],
 [[[Vector2(0, 0), 13], [Vector2(1, 0), 13], [Vector2(0, 1), 9], [Vector2(1, 1), 13], [Vector2(0, 2), 9]],[19,1]],
@@ -42,9 +46,11 @@ var recipes = [[[[Vector2(0,0),4]],[8,4]],[[[Vector2(0,0),8],[Vector2(0,1),8]],[
 [[[Vector2(0, 0),3],[Vector2(1, 0),3],[Vector2(0, 1),3],[Vector2(1, 1),3]], [52, 4]], #Stone bricks
 [[[Vector2(0, 0),15],[Vector2(0, 1),9]], [53, 4]], #Torches
 [[[Vector2(0, 0),9],[Vector2(2, 0),9],[Vector2(0, 1),9],[Vector2(1, 1),9],[Vector2(2, 1),9],[Vector2(0, 2),9],[Vector2(2, 2),9]], [54, 4]], #Ladder
-[[[Vector2(0, 0),8],[Vector2(1, 0),8],[Vector2(2, 0),8],[Vector2(0, 1),8],[Vector2(2, 1),8],[Vector2(0, 2),8],[Vector2(1, 2),8],[Vector2(2, 2),8]], [58, 1]], #Chest
+[[[Vector2(0, 0),-1],[Vector2(1, 0),-1],[Vector2(2, 0),-1],[Vector2(0, 1),-1],[Vector2(2, 1),-1],[Vector2(0, 2),-1],[Vector2(1, 2),-1],[Vector2(2, 2),-1]], [58, 1]], #Chest
 [[[Vector2(0, 0),24],[Vector2(2, 0),24],[Vector2(1, 1),24]], [59, 1]], #Bucket
 [[[Vector2(0, 0),8],[Vector2(1, 0),8],[Vector2(0, 1),8],[Vector2(1, 1),8],[Vector2(0, 2),8],[Vector2(1, 2),8]], [62, 3]], #Oak door
+[[[Vector2(0, 0),64]], [65, 4]], #Birch planks
+[[[Vector2(0, 0),68]], [69, 4]], #Spruce planks
 ] #[[item1[pos (to orgin),id],item2,ect],[result id,result num]]
 var crafted = 0
 var made = false
@@ -282,19 +288,29 @@ func check_crafting():
 	var loc = 0
 	var orgin = Vector2(-1,-1)
 	var crafting = []
+	var craftingAll = []
 	for y in range(size):
 		for x in range(size):
 			if craft[0][loc] > 0 and orgin == Vector2(-1,-1):
 				orgin = Vector2(x,y)
 				crafting.append([Vector2(0,0),craft[0][loc]])
+				if PLANK_TYPES.has(craft[0][loc]):
+					craftingAll.append([Vector2(0,0),ALL_PLANKS])
+				else:
+					craftingAll.append([Vector2(0,0),craft[0][loc]])
 			elif craft[0][loc] > 0:
 				crafting.append([Vector2(x,y)-orgin,craft[0][loc]])
+				if PLANK_TYPES.has(craft[0][loc]):
+					craftingAll.append([Vector2(x,y)-orgin,ALL_PLANKS])
+				else:
+					craftingAll.append([Vector2(x,y)-orgin,craft[0][loc]])
 			loc += 1
 	if crafting == []:
 		made = false
 		return
 	for i in range(recipes.size()):
-		if recipes[i][0] == crafting:
+		print(craftingAll)
+		if recipes[i][0] == crafting or craftingAll == recipes[i][0]:
 			crafted = i
 			made = true
 			return

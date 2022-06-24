@@ -78,6 +78,8 @@ func _physics_process(_delta):
 				playerChunk = floor($Camera2D.global_position.x/16/ main.chunkSize.x)
 			if abs(playerLoadPos.x - round($Camera2D.global_position.x / 16)) > 0 or abs(playerLoadPos.y - round(position.y / 16)) > 0: #Renders blocks if moved a certain distance
 				playerLoadPos = Vector2(round($Camera2D.global_position.x / 16),round($Camera2D.global_position.y / 16))
+				print(main.get_biome(playerLoadPos.x))
+				print(main.precip.get_noise_1d(playerLoadPos.x), " temp: ", main.temps.get_noise_1d(playerLoadPos.x))
 				main.load_chunk(int(playerChunk))
 			if get_global_mouse_position().x < global_position.x:
 				$head.rotation = $head.global_position.angle_to_point(get_global_mouse_position()) #+ deg2rad(90)
@@ -122,7 +124,7 @@ func _physics_process(_delta):
 					if inAir:
 						if firstHeight - round(position.y/16.0) < -3:
 							take_damage((firstHeight - round(position.y/16.0) + 3)*-1)
-					if !$movement.playing and motion.x != 0 and blockOn != 0:
+					if !$movement.playing and motion.x != 0 and ![0,41].has(blockOn):
 						var soundFile = main.sound_data[main.block_data[blockOn].soundFiles].step
 						$movement.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
 						$movement.play()
