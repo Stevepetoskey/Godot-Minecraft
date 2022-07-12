@@ -140,6 +140,7 @@ func _ready():
 			playerData.append(0)
 			playerData.append(0)
 		player.position = playerData[0]; player.health = playerData[1]; player.hunger = playerData[2]; player.motion = playerData[3]; player.inAir = playerData[4]; player.firstHeight = playerData[5]; player.new = playerData[6]; player.saturation = playerData[7]; player.exhaustion = playerData[8]
+		$Lighting.playerLoaded = true
 	else:
 		for _i in range(36):
 			$CanvasLayer/hotbar.inventory[0].append(0)
@@ -152,6 +153,8 @@ func _ready():
 		chestData[0].append(0)
 		chestData[1].append(0)
 	seed(worldSeed)
+	if worldType == "Flat":
+		$Lighting.lostLevel = 128
 	cave.seed = worldSeed
 	noise.seed = randi()
 	temps.seed = randi()
@@ -239,6 +242,7 @@ func create_chunk(chunkX):
 							else:
 								chunk[x][y] = block
 							if y == height and y < WATERLEVEL:
+								#Tree generation
 								if (x-lastTree > 1 or lastTree == -1) and randi()%2 == 1 and cave.get_noise_3d(x+(chunkX*chunkSize.x),y,0) < 0.21 and [1,5].has(biome["id"]):
 									lastTree = x
 									var treeH = int(rand_range(4,6))
@@ -261,6 +265,8 @@ func create_chunk(chunkX):
 										for tY in range(trees[treeType][tX].size()-1,-1,-1):
 											if trees[treeType][tX][tY] > 1 and block("get",Vector2(chunkX*chunkSize.x+x+(tX-2),tY+treeH)) == 0:
 												block(str(trees[treeType][tX][tY]),Vector2(chunkX*chunkSize.x+x+(tX-2),tY+treeH))
+								elif randi()%2 == 1 and cave.get_noise_3d(x+(chunkX*chunkSize.x),y,0) < 0.21 and [0,1,4,5].has(biome["id"]):
+									block("94",Vector2(chunkX*chunkSize.x+x,y-1))
 				#yield(get_tree().create_timer(0.01), "timeout")
 				for x in range(chunkSize.x):
 					var height = round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+40
@@ -279,21 +285,36 @@ func create_chunk(chunkX):
 									if randi() % (int(abs(x2-x)+abs(y2-y))+1) <= 1.5 and [1,2,45,42].has(block("get",Vector2(chunkX*chunkSize.x+x2,y2))):
 #										if [1,2].has(block("get",Vector2(chunkX*chunkSize.x+x2,y2))):
 										block("48",Vector2(chunkX*chunkSize.x+x2,y2),1)
-						if y > 62 and randi()%100 == 1:
+						if y > 62 and randi()%100 == 1: #coal
 							for x2 in range(x-3,x+3):
 								for y2 in range(y-1,y+2):
 									if randi()%2 == 1 and block("get",Vector2(chunkX*chunkSize.x+x2,y2)) == 3:
 										block("6",Vector2(chunkX*chunkSize.x+x2,y2))
-						elif y > 80 and randi()%150 == 1:
+						elif y > 80 and randi()%150 == 1: #iron
 							for x2 in range(x-1,x+2):
 								for y2 in range(y-1,y+2):
 									if randi()%2 == 1 and block("get",Vector2(chunkX*chunkSize.x+x2,y2)) == 3:
 										block("7",Vector2(chunkX*chunkSize.x+x2,y2))
-						elif y > 120 and randi()%100 == 1:
+						elif y > 100 and randi()%175 == 1: #gold
+							for x2 in range(x-1,x+2):
+								for y2 in range(y-1,y+2):
+									if randi()%2 == 1 and block("get",Vector2(chunkX*chunkSize.x+x2,y2)) == 3:
+										block("72",Vector2(chunkX*chunkSize.x+x2,y2))
+						elif y > 100 and randi()%300 == 1: #lapis
+							for x2 in range(x-1,x+2):
+								for y2 in range(y-1,y+2):
+									if randi()%2 == 1 and block("get",Vector2(chunkX*chunkSize.x+x2,y2)) == 3:
+										block("77",Vector2(chunkX*chunkSize.x+x2,y2))
+						elif y > 120 and randi()%200 == 1: #diamond
 							for x2 in range(x-1,x+2):
 								for y2 in range(y-1,y+2):
 									if randi()%2 == 1 and block("get",Vector2(chunkX*chunkSize.x+x2,y2)) == 3:
 										block("27",Vector2(chunkX*chunkSize.x+x2,y2))
+						elif y > 120 and randi()%150 == 1: #redstone
+							for x2 in range(x-1,x+2):
+								for y2 in range(y-1,y+2):
+									if randi()%2 == 1 and block("get",Vector2(chunkX*chunkSize.x+x2,y2)) == 3:
+										block("82",Vector2(chunkX*chunkSize.x+x2,y2))
 						if y == chunkSize.y-1:
 							chunk[x][y] = 35
 			"Flat":
@@ -306,12 +327,13 @@ func create_chunk(chunkX):
 						elif y == chunkSize.y-4:
 							chunk[x][y] = 1
 		chunks[chunkX][0] = chunks[chunkX][1].duplicate(true)
-		for x in range(chunkSize.x):
-			for y in range(chunkSize.y):
-				if cave.get_noise_3d(x+(chunkX*chunkSize.x),y,0) > 0.21 and chunks[chunkX][1][x][y] != 35 and y >= round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+50:
-					chunks[chunkX][1][x][y] = 0
-				if cave.get_noise_3d(x+(chunkX*chunkSize.x),y,4) > 0.21 and chunks[chunkX][0][x][y] != 35 and y >= round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+50:
-					chunks[chunkX][0][x][y] = 0
+		if ["Default"].has(worldType):
+			for x in range(chunkSize.x):
+				for y in range(chunkSize.y):
+					if cave.get_noise_3d(x+(chunkX*chunkSize.x),y,0) > 0.21 and chunks[chunkX][1][x][y] != 35 and y >= round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+50:
+						chunks[chunkX][1][x][y] = 0
+					if cave.get_noise_3d(x+(chunkX*chunkSize.x),y,4) > 0.21 and chunks[chunkX][0][x][y] != 35 and y >= round(((noise.get_noise_1d(x+(chunkX*chunkSize.x))+1)/4.0)*chunkSize.y)+50:
+						chunks[chunkX][0][x][y] = 0
 		if toPlace.has(chunkX):
 			for i in range(toPlace[chunkX].size()):
 				block(str(toPlace[chunkX][i][0]),toPlace[chunkX][i][1],toPlace[chunkX][i][2])
@@ -470,12 +492,17 @@ func build_event(action,pos,id,z = 1,itemAction = true):
 				5:
 					if randi()%100 < 10:
 						$entities.add_item(57,1,pos*Vector2(16,16),false)
+					if randi()%200 < 10:
+						$entities.add_item(81,1,pos*Vector2(16,16),false)
 				66:
 					if randi()%100 < 10:
 						$entities.add_item(67,1,pos*Vector2(16,16),false)
 				70:
 					if randi()%100 < 10:
 						$entities.add_item(71,1,pos*Vector2(16,16),false)
+				94:
+					if randi()%50 < 10:
+						$entities.add_item(91,1,pos*Vector2(16,16),false)
 				_:
 					if data.drops.size() >= 1 and itemAction:
 						for i in range(data.drops.size()):

@@ -22,7 +22,7 @@ func _ready():
 	main.connect("update",self,"on_update")
 
 func is_block_loaded(pos):
-	if main.chunks[main.get_chunk(pos.x)][1][main.chunkifyI(pos.x)][pos.y] > 0:
+	if pos.y < 128 and main.chunks[main.get_chunk(pos.x)][1][main.chunkifyI(pos.x)][pos.y] > 0:
 		if get_node("../../chunks").has_node(str(main.get_chunk(pos.x)) + "/1,"+str(main.chunkifyI(pos.x))+","+str(pos.y)):
 			return true
 		else:

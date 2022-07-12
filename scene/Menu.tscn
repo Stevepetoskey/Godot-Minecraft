@@ -416,7 +416,6 @@ text = "Create World"
 align = 1
 
 [node name="Customize" type="TextureButton" parent="CanvasLayer/WorldSelect/NewWorld"]
-visible = false
 margin_left = 504.0
 margin_top = 576.0
 margin_right = 704.0

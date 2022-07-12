@@ -1,4 +1,4 @@
-extends Sprite
+extends Node2D
 
 const ALL_PLANKS = -1
 const PLANK_TYPES = [65,8,69]
@@ -51,6 +51,20 @@ var recipes = [[[[Vector2(0,0),4]],[8,4]], #Oak log
 [[[Vector2(0, 0),8],[Vector2(1, 0),8],[Vector2(0, 1),8],[Vector2(1, 1),8],[Vector2(0, 2),8],[Vector2(1, 2),8]], [62, 3]], #Oak door
 [[[Vector2(0, 0),64]], [65, 4]], #Birch planks
 [[[Vector2(0, 0),68]], [69, 4]], #Spruce planks
+[[[Vector2(0, 0),75]], [76, 9]], #Golden nugget
+[[[Vector2(0, 0),76],[Vector2(1, 0),76],[Vector2(2, 0),76],[Vector2(0, 1),76],[Vector2(1, 1),76],[Vector2(2, 1),76],[Vector2(0, 2),76],[Vector2(1, 2),76],[Vector2(2, 2),76]], [75, 1]], #Golden ingot
+[[[Vector2(0, 0),75],[Vector2(1, 0),75],[Vector2(2, 0),75],[Vector2(0, 1),75],[Vector2(1, 1),75],[Vector2(2, 1),75],[Vector2(0, 2),75],[Vector2(1, 2),75],[Vector2(2, 2),75]], [73, 1]], #Block of Gold
+[[[Vector2(0, 0),78],[Vector2(1, 0),78],[Vector2(2, 0),78],[Vector2(0, 1),78],[Vector2(1, 1),78],[Vector2(2, 1),78],[Vector2(0, 2),78],[Vector2(1, 2),78],[Vector2(2, 2),78]], [79, 1]], #Block of Lapis Lazuli
+[[[Vector2(0, 0),83],[Vector2(1, 0),83],[Vector2(2, 0),83],[Vector2(0, 1),83],[Vector2(1, 1),83],[Vector2(2, 1),83],[Vector2(0, 2),83],[Vector2(1, 2),83],[Vector2(2, 2),83]], [84, 1]], #Redstone Block
+[[[Vector2(0, 0),83],[Vector2(0, 1),9]], [80, 1]], #Redstone torch
+[[[Vector2(0, 0),75],[Vector2(1, 0),75],[Vector2(2, 0),75],[Vector2(1, 1),9],[Vector2(1, 2),9]], [85, 1]], #Gold Pick
+[[[Vector2(0, 0),75],[Vector2(1, 0),75],[Vector2(0, 1),75],[Vector2(1, 1),9],[Vector2(1, 2),9]], [86, 1]], #Gold axe
+[[[Vector2(0, 0),75],[Vector2(1, 0),75],[Vector2(0, 1),9],[Vector2(1, 1),75],[Vector2(0, 2),9]], [86, 1]], #Gold axe mirror
+[[[Vector2(0, 0),75],[Vector2(0, 1),9],[Vector2(0, 2),9]], [87, 1]], #Gold shovel
+[[[Vector2(0, 0),75],[Vector2(0, 1),75],[Vector2(0, 2),9]], [88, 1]], #Gold sword
+[[[Vector2(0, 0),75],[Vector2(1, 0),75],[Vector2(1, 1),9],[Vector2(1, 2),9]], [89, 1]], #Gold hoe
+[[[Vector2(0, 0),75],[Vector2(1, 0),75],[Vector2(0, 1),9],[Vector2(0, 2),9]], [89, 1]], #Gold hoe mirror
+[[[Vector2(0, 0),92],[Vector2(1, 0),92],[Vector2(2, 0),92]], [93, 1]], #bread
 ] #[[item1[pos (to orgin),id],item2,ect],[result id,result num]]
 var crafted = 0
 var made = false

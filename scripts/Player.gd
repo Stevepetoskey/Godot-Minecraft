@@ -78,8 +78,6 @@ func _physics_process(_delta):
 				playerChunk = floor($Camera2D.global_position.x/16/ main.chunkSize.x)
 			if abs(playerLoadPos.x - round($Camera2D.global_position.x / 16)) > 0 or abs(playerLoadPos.y - round(position.y / 16)) > 0: #Renders blocks if moved a certain distance
 				playerLoadPos = Vector2(round($Camera2D.global_position.x / 16),round($Camera2D.global_position.y / 16))
-				print(main.get_biome(playerLoadPos.x))
-				print(main.precip.get_noise_1d(playerLoadPos.x), " temp: ", main.temps.get_noise_1d(playerLoadPos.x))
 				main.load_chunk(int(playerChunk))
 			if get_global_mouse_position().x < global_position.x:
 				$head.rotation = $head.global_position.angle_to_point(get_global_mouse_position()) #+ deg2rad(90)

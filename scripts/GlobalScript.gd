@@ -1,13 +1,13 @@
 extends Node
 
-const CURRENTVER = "0.4.0 pre 1"
+const CURRENTVER = "0.4.0 pre 2"
 const STABLE = false
 
 var savegame = File.new() #file
 var save_path = "user://saves/" #place of the file
 var save_data
-#0 is survival 1 is creative
-var gamemode = 0
+
+var gamemode = "Survival"
 var worldSeed = 0
 var worldType = "Default"
 var worldNamePath = "newWorld"

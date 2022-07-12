@@ -7,13 +7,17 @@
 - Structures (Dungeons, Towers)
 - add entities (Sheep, Creeper)
 - add bow with camera that moves with cursor to extent
-- Wheat
+- Wheat (pre 3)
 - water acts like water
 - Gamemodes (Creative, Survival)
+- redstone dust (pre 3)
+- Menu needs to look better
 - redstone (release tbd)
 
 BUGS THAT NEED FIXING
 - block rendering engine seems to be held together with duct tape and not as optimized as it could be
+- rework inventory system
+- fix furnaces not dropping items
 
 O: 4
 Period: 15
@@ -43,3 +47,17 @@ L: 2
 - Added caves
 - Better World Generation
 - Set biomes
+
+## Alpha 4 pre 2
+- Fixed light not rendering after loading world
+
+## Alpha 4 pre 3
+- Added redstone
+- Added redstone torch (only a light source right now)
+- Added Lapis Lazuli
+- Added gold
+- Added wheat (No farming yet)
+- Added bread
+- Added Golden items (pickaxes, axes, ect...)
+- Added rotten flesh
+- Added grass

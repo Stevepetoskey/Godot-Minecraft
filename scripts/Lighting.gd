@@ -13,6 +13,7 @@ var callAmount = 0
 var updated = []
 var worldLoaded = false
 var playerLoaded = false
+var lostLevel = 85
 
 var day = true
 onready var main = get_node("..")
@@ -50,10 +51,12 @@ func _ready():
 func _process(delta):
 	render()
 	var cursorPos = vec2_round(get_node("../cursor").position / Vector2(16,16)) - vec2_round(get_node("../Player").position/ Vector2(16,16)) + Vector2(LightRect.x/2,LightRect.y/2)
-	get_node("../CanvasLayer/Label").text = "Light Level: " + str(lightArray[cursorPos.x][cursorPos.y])
+	if cursorPos.y < 128 and cursorPos.y >= 0:
+		get_node("../CanvasLayer/Label").text = "Light Level: " + str(lightArray[cursorPos.x][cursorPos.y])
 
 #Starts the calculations of the light around the player
 func render():
+#	print(!lightThread.is_active(),worldLoaded,playerLoaded)
 	if !lightThread.is_active() and worldLoaded and playerLoaded:
 		prePlayerPos = get_node("../Player").position
 		lightThread.start(self,"prep_light",lightArray.duplicate(true),1)
@@ -69,7 +72,7 @@ func prep_light(data): #threadLight is what will replace the main lightArray whe
 				var backBlock = main.block("get",pos,0)
 				if transparent.has(block):
 					if transparent.has(backBlock):
-						if pos.y < 90: #normal 90; level at which ambient light is lost
+						if pos.y < lostLevel: #normal 90; level at which ambient light is lost
 							threadLight[x][y] = ambientLevel
 						else:
 							threadLight[x][y] = 0

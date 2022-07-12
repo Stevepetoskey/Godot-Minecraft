@@ -63,6 +63,9 @@ func render():
 			$Sprite.material.set_shader_param("color",Color(0.36,0.83,0.16,1.0))
 		70:
 			$Sprite.material.set_shader_param("color",Color(0.12,0.36,0.17,1.0))
+		94:
+			$CollisionShape2D.disabled = true
+			$Sprite.material.set_shader_param("color",Color(0.25,0.56,0.11,1.0))
 	rendered = true
 
 func update_Furnace():
