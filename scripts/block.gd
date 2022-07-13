@@ -94,23 +94,25 @@ func update_Furnace():
 	$Sprite.texture = [load("res://textures/Blocks/furnace_front.png"),load("res://textures/Blocks/furnace_front_on.png")][int(smelting)]
 
 func on_update():
+	match id:
+		94:
+			if ![1,2,45].has(main.block("get",global_position/ Vector2(16,16) + Vector2(0,1),z)):
+				main.build_event("break",global_position/ Vector2(16,16),0,z)
 	if z < 1:
 		var i = 0
 		for x in range(-1,2):
 			for y in range(-1,2):
 				if abs(x) != abs(y):
 					var block = get_node("../../..").block("get",global_position/ Vector2(16,16) + Vector2(x,y))
-					if block != null and block > 0 and ![53,54,62,63].has(block) and !has_node(str(x) + str(y)):
+					if block != null and block > 0 and ![53,54,62,63,41,60,94].has(block) and !has_node(str(x) + str(y)):
 						var sprite = Sprite.new()
 						sprite.texture = load("res://textures/Blocks/BackgroundShade.png")
 						sprite.rotation_degrees = shadeRotations[i]
 						sprite.name = str(x)+str(y)
 						add_child(sprite)
-					if block == 0 and has_node(str(x) + str(y)):
+					if [0,53,54,62,63,41,60,94].has(block) and has_node(str(x) + str(y)):
 						get_node(str(x) + str(y)).queue_free()
 					i+=1
-	if id != 0 and main.block("get",global_position/ Vector2(16,16),z) != id:
-		queue_free()
 
 func remove_item(loc):
 	data[1][loc] -= 1

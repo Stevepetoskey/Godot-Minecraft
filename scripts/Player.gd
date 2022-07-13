@@ -122,7 +122,7 @@ func _physics_process(_delta):
 					if inAir:
 						if firstHeight - round(position.y/16.0) < -3:
 							take_damage((firstHeight - round(position.y/16.0) + 3)*-1)
-					if !$movement.playing and motion.x != 0 and ![0,41].has(blockOn):
+					if !$movement.playing and motion.x != 0 and ![0,41,60].has(blockOn):
 						var soundFile = main.sound_data[main.block_data[blockOn].soundFiles].step
 						$movement.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
 						$movement.play()
@@ -197,9 +197,10 @@ func _on_BlockTest_area_entered(area):
 			54:
 				onLadder.append(area)
 			41:
-				inWater.append(area)
+				if area.get_node("..").z == 1:
+					inWater.append(area)
 			60:
-				if get_node("../water").water[[area.get_node("..").global_position/ Vector2(16,16),1]] > 6:
+				if area.get_node("..").z == 1 and main.interactableBlockData[[area.get_node("..").pos,1]][0] > 6:
 					inWater.append(area)
 
 func _on_BlockTest_area_exited(area):

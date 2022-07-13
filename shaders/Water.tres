@@ -7,9 +7,9 @@ uniform float shade = 0;
 uniform float value = 1.0;
 
 void fragment() {
+	vec2 realUV = vec2((UV.x*16.0)/16.0,(UV.y*512.0-floor(UV.y*512.0/16.0)*16.0)/16.0);
 	float realValue = 1.0-value;
 	float visible = 0.75;
-	vec2 realUV = vec2((UV.x*512.0-floor(UV.x*512.0/16.0)*16.0)/16.0,(UV.y*512.0-floor(UV.y*512.0/16.0)*16.0)/16.0);
 	if (realUV.y <= realValue) {
 		visible = 0.0
 	}

@@ -44,7 +44,7 @@ func _process(_delta):
 				$destroy.visible = false
 			if Input.is_action_pressed("break") and main.block("get",position/ Vector2(16,16),z) > 0:
 				var currentBlock = main.block("get",position/ Vector2(16,16),z)
-				if !$breaking.playing:
+				if !$breaking.playing and ![60,41].has(currentBlock):
 					var soundFile = main.sound_data[main.block_data[currentBlock].soundFiles].dig
 					$breaking.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
 					$breaking.play()
@@ -79,7 +79,7 @@ func _process(_delta):
 						$blockSlowdown.start()
 			if Input.is_action_just_pressed("build") and [0,41,60].has(main.block("get",position/ Vector2(16,16),z)):
 				if main.block("get",position/ Vector2(16,16),z)==41 and hotbar.inventory[0][get_node("../CanvasLayer/hotbar/select").selected] == 59: #Take water in bucket
-					main.build_event("break",position/ Vector2(16,16),0,z)
+					main.build_event("break",position/ Vector2(16,16),0,z,false)
 					hotbar.remove_from_inventory(get_node("../CanvasLayer/hotbar/select").selected,1)
 					hotbar.add_to_inventory(41,1)
 				if hotbar.foodData.has(selectedItem) and player.hunger < 20: #Eat food
@@ -90,11 +90,7 @@ func _process(_delta):
 					player.saturation += saturation
 					hotbar.remove_from_inventory(get_node("../CanvasLayer/hotbar/select").selected,1)
 				elif !hotbar.items.has(selectedItem) and selectedItem != 0: #Place block
-#					if main.block("get",position/ Vector2(16,16),z) == 41:
-#						print(get_node("../water").water)
-#						get_node("../water").water.erase(position/ Vector2(16,16))
-#						print(get_node("../water").water)
-					if selectedItem == 62:
+					if selectedItem == 62: #Builds door
 						if [0,41,60].has(main.block("get",Vector2(position.x/16,position.y/16-1),z)):
 							$breakingEnd.stop()
 							var soundFile = main.sound_data[main.block_data[selectedItem].soundFiles].place
@@ -102,15 +98,24 @@ func _process(_delta):
 							$breaking.play()
 							main.build_event("build",position/ Vector2(16,16),selectedItem,z)
 							main.build_event("build",Vector2(position.x/16,position.y/16-1),63,z,false)
-					else:
+					else: #Everything else
 						$breakingEnd.stop()
-						var soundFile = main.sound_data[main.block_data[selectedItem].soundFiles].place
-						$breaking.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
-						$breaking.play()
+						if ![41,60].has(selectedItem):
+							var soundFile = main.sound_data[main.block_data[selectedItem].soundFiles].place
+							$breaking.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
+							$breaking.play()
+						if [41,60].has(main.block("get",position/ Vector2(16,16),z)):
+							main.build_event("break",position/ Vector2(16,16),0,z,false)
+						if selectedItem == 41:
+							hotbar.add_to_inventory(59,1)
 						main.build_event("build",position/ Vector2(16,16),selectedItem,z)
 			elif Input.is_action_just_pressed("build"): #Interact
 #				if hotbar.itemData.has(hotbar.inventory[0][get_node("../CanvasLayer/hotbar/select").selected]) and hotbar.itemData[hotbar.inventory[0][get_node("../CanvasLayer/hotbar/select").selected]][0] == 4:
 				match main.block("get",position/ Vector2(16,16),z):
+					1,2:
+						if hotbar.itemData.has(selectedItem) and hotbar.itemData[selectedItem	][0] == 4:
+							main.build_event("break",position/ Vector2(16,16),0,z,false)
+							main.build_event("build",position/ Vector2(16,16),95,z,false)
 					10:
 						yield(get_tree().create_timer(0.05), "timeout")
 						get_node("../CanvasLayer/Inventory").visible = true

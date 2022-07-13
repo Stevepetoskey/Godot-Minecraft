@@ -80,13 +80,14 @@ func _ready():
 		for x in range(9):
 			var icon = load("res://assets/inventoryIcon.tscn").instance()
 			icon.id = loc
+			icon.main = self
 			if loc < 9:
 				icon.rect_position = Vector2(x*18-79,y*18+6)
 			else:
 				icon.rect_position = Vector2(x*18-79,y*18+2)
 			icon.clickable = true
-			icon.inventoryLoc = "../../hotbar"
-			add_child(icon)
+			icon.inventoryLoc = "../../../hotbar"
+			$icons.add_child(icon)
 			loc += 1
 	#inventory crafting
 	loc = 0
@@ -94,21 +95,23 @@ func _ready():
 		for x in range(2):
 			var icon = load("res://assets/inventoryIcon.tscn").instance()
 			icon.id = loc
+			icon.main = self
 			icon.type = "ic"
 			icon.rect_position = Vector2(x*18+11,y*18-64)
 			icon.clickable = true
-			icon.inventoryLoc = "../../hotbar"
-			add_child(icon)
+			icon.inventoryLoc = "../../../hotbar"
+			$icons.add_child(icon)
 			loc += 1
 	#inventory crafting result
 	var icon = load("res://assets/inventoryIcon.tscn").instance()
 	icon.id = 0
+	icon.main = self
 	icon.type = "icr"
 	icon.rect_position = Vector2(66.5,-54)
 	icon.clickable = true
-	icon.inventoryLoc = "../../hotbar"
+	icon.inventoryLoc = "../../../hotbar"
 	icon.texture_normal = load("res://textures/Blocks/bedrock.png")
-	add_child(icon)
+	$icons.add_child(icon)
 	#crafting table
 	loc = 0
 	for y in range(3):
@@ -116,7 +119,7 @@ func _ready():
 			var tableIcon = load("res://assets/inventoryIcon.tscn").instance()
 			tableIcon.id = loc
 			tableIcon.type = "ct"
-			tableIcon.mainLoc = "../../Inventory"
+			tableIcon.main = self
 			tableIcon.rect_position = Vector2(x*18+31,y*18+17.5)
 			tableIcon.clickable = true
 			tableIcon.inventoryLoc = "../../hotbar"
@@ -125,7 +128,7 @@ func _ready():
 	var tableIcon = load("res://assets/inventoryIcon.tscn").instance()
 	tableIcon.id = 0
 	tableIcon.type = "ctr"
-	tableIcon.mainLoc = "../../Inventory"
+	tableIcon.main = self
 	tableIcon.rect_position = Vector2(122,34)
 	tableIcon.clickable = true
 	tableIcon.inventoryLoc = "../../hotbar"
@@ -145,7 +148,7 @@ func _ready():
 				furnaceIcon.type = "fr"
 				furnaceIcon.rect_position = Vector2(115,34)
 				furnaceIcon.rect_scale = Vector2(1.2,1.2)
-		furnaceIcon.mainLoc = "../../Inventory"
+		furnaceIcon.main = self
 		furnaceIcon.clickable = true
 		furnaceIcon.inventoryLoc = "../../hotbar"
 		get_node("../furnace").add_child(furnaceIcon)
@@ -156,7 +159,7 @@ func _ready():
 			var chestIcon = load("res://assets/inventoryIcon.tscn").instance()
 			chestIcon.id = loc
 			chestIcon.type = "sc"
-			chestIcon.mainLoc = "../../Inventory"
+			chestIcon.main = self
 			chestIcon.rect_position = Vector2(x*18+9,y*18+19)
 			chestIcon.clickable = true
 			chestIcon.inventoryLoc = "../../hotbar"

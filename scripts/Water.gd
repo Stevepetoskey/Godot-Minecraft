@@ -1,24 +1,58 @@
 extends StaticBody2D
 
+const MAX_LEVEL = 8
+
 var id = 0
 var z = 1
+
+var gone = false
 
 onready var main = get_node("../../..")
 onready var pos = global_position/ Vector2(16,16)
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	get_node("../../../water").connect("waterUpdate",self,"on_water_update")
-	main.connect("update",self,"on_update")
-	on_water_update()
+	if z == 0:
+		z_index = -1
+	if main.interactableBlockData.has([pos,z]):
+		var currentLevel = main.interactableBlockData[[pos,z]][0]
+		$Sprite.material.set_shader_param("value",currentLevel/8.0)
 
-func on_water_update():
-	for child in get_node("..").get_children():
-		if child.name == name and child != self:
-			print(name)
-	if get_node("../../../water").water.has([pos,z]):
-		$Sprite.material.set_shader_param("value",get_node("../../../water").water[[global_position/ Vector2(16,16),z]]/8.0)
-
-func on_update():
-	if id != 0 and main.block("get",pos,z) != id:
-		queue_free()
+func _on_Spread_timeout():
+	var currentLevel = MAX_LEVEL
+	if id == 60:
+		currentLevel = main.interactableBlockData[[pos,z]][0]
+	$Sprite.material.set_shader_param("value",currentLevel/8.0)
+	var bottomBlock = main.block("get",pos + Vector2(0,1),z)
+	var leftBlock = main.block("get",pos - Vector2(1,0),z)
+	var rightBlock = main.block("get",pos + Vector2(1,0),z)
+	var topBlock = main.block("get",pos - Vector2(0,1),z)
+	var spreadBellow = false
+	#Spreading bellow
+	if bottomBlock == 0 or main.block_data[bottomBlock].waterBreaks:
+		if main.block_data[bottomBlock].waterBreaks:
+			main.build_event("break",pos + Vector2(0,1),0,z)
+		main.build_event("build",pos + Vector2(0,1),60,z,false,{"level":MAX_LEVEL})
+		spreadBellow = true
+	elif bottomBlock == 60 and main.interactableBlockData[[pos + Vector2(0,1),z]][0] < MAX_LEVEL:
+		main.interactableBlockData[[pos + Vector2(0,1),z]][0] = MAX_LEVEL
+	if (![60,41].has(bottomBlock) or id == 41) and !spreadBellow and currentLevel > 1:
+		#spreading left
+		if (leftBlock == 0 or main.block_data[leftBlock].waterBreaks):
+			if main.block_data[leftBlock].waterBreaks:
+				main.build_event("break",pos - Vector2(1,0),0,z)
+			main.build_event("build",pos - Vector2(1,0),60,z,false,{"level":currentLevel -1})
+		elif leftBlock == 60 and main.interactableBlockData[[pos - Vector2(1,0),z]][0] < currentLevel - 1:
+			main.interactableBlockData[[pos - Vector2(1,0),z]][0] = currentLevel - 1
+		#spreading right
+		if (rightBlock == 0 or main.block_data[rightBlock].waterBreaks):
+			if main.block_data[rightBlock].waterBreaks:
+				main.build_event("break",pos + Vector2(1,0),0,z)
+			main.build_event("build",pos + Vector2(1,0),60,z,false,{"level":currentLevel -1})
+		elif rightBlock == 60 and main.interactableBlockData[[pos + Vector2(1,0),z]][0] < currentLevel - 1:
+			main.interactableBlockData[[pos + Vector2(1,0),z]][0] = currentLevel - 1
+	if id != 41 and (![60,41].has(leftBlock) or main.interactableBlockData[[pos - Vector2(1,0),z]][0] <= currentLevel) and (![60,41].has(rightBlock) or main.interactableBlockData[[pos + Vector2(1,0),z]][0] <= currentLevel) and ![60,41].has(topBlock):
+		if [60,41].has(bottomBlock):
+			main.interactableBlockData[[pos,z]][0] -= 1
+		main.interactableBlockData[[pos,z]][0] -= 1
+		if main.interactableBlockData[[pos,z]][0] <= 0:
+			main.build_event("break",pos,0,z,false)

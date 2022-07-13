@@ -1,4 +1,4 @@
-[gd_scene load_steps=61 format=2]
+[gd_scene load_steps=60 format=2]
 
 [ext_resource path="res://scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://assets/Player.tscn" type="PackedScene" id=2]
@@ -29,7 +29,6 @@
 [ext_resource path="res://textures/environment/sky.png" type="Texture" id=27]
 [ext_resource path="res://textures/Blocks/dirt.png" type="Texture" id=28]
 [ext_resource path="res://textures/Gui/container/shulker_box.png" type="Texture" id=29]
-[ext_resource path="res://scripts/waterSystem.gd" type="Script" id=30]
 [ext_resource path="res://scripts/CreativeInventory.gd" type="Script" id=31]
 [ext_resource path="res://Audio/ui/click.ogg" type="AudioStream" id=32]
 [ext_resource path="res://scripts/GUI.gd" type="Script" id=33]
@@ -60,34 +59,6 @@ lacunarity = 3.54
 [sub_resource type="AtlasTexture" id=17]
 atlas = ExtResource( 10 )
 region = Rect2( 0, 0, 176, 166 )
-
-[sub_resource type="AtlasTexture" id=18]
-atlas = ExtResource( 34 )
-region = Rect2( 0, 0, 195, 136 )
-
-[sub_resource type="AtlasTexture" id=19]
-atlas = ExtResource( 35 )
-region = Rect2( 0, 1, 28, 31 )
-
-[sub_resource type="AtlasTexture" id=20]
-atlas = ExtResource( 35 )
-region = Rect2( 0, 32, 28, 32 )
-
-[sub_resource type="AtlasTexture" id=21]
-atlas = ExtResource( 35 )
-region = Rect2( 28, 32, 28, 32 )
-
-[sub_resource type="AtlasTexture" id=22]
-atlas = ExtResource( 35 )
-region = Rect2( 0, 64, 28, 28 )
-
-[sub_resource type="AtlasTexture" id=23]
-atlas = ExtResource( 35 )
-region = Rect2( 0, 96, 28, 32 )
-
-[sub_resource type="AtlasTexture" id=24]
-atlas = ExtResource( 35 )
-region = Rect2( 28, 96, 28, 32 )
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 16 )
@@ -141,6 +112,34 @@ region = Rect2( 0, 46, 200, 20 )
 [sub_resource type="AtlasTexture" id=12]
 atlas = ExtResource( 6 )
 region = Rect2( 0, 86, 200, 20 )
+
+[sub_resource type="AtlasTexture" id=18]
+atlas = ExtResource( 34 )
+region = Rect2( 0, 0, 195, 136 )
+
+[sub_resource type="AtlasTexture" id=19]
+atlas = ExtResource( 35 )
+region = Rect2( 0, 1, 28, 31 )
+
+[sub_resource type="AtlasTexture" id=20]
+atlas = ExtResource( 35 )
+region = Rect2( 0, 32, 28, 32 )
+
+[sub_resource type="AtlasTexture" id=21]
+atlas = ExtResource( 35 )
+region = Rect2( 28, 32, 28, 32 )
+
+[sub_resource type="AtlasTexture" id=22]
+atlas = ExtResource( 35 )
+region = Rect2( 0, 64, 28, 28 )
+
+[sub_resource type="AtlasTexture" id=23]
+atlas = ExtResource( 35 )
+region = Rect2( 0, 96, 28, 32 )
+
+[sub_resource type="AtlasTexture" id=24]
+atlas = ExtResource( 35 )
+region = Rect2( 28, 96, 28, 32 )
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
@@ -227,104 +226,7 @@ __meta__ = {
 texture = SubResource( 17 )
 region_rect = Rect2( 0, 0, 176, 166 )
 
-[node name="CI" type="Sprite" parent="CanvasLayer/Inventory"]
-visible = false
-texture = SubResource( 18 )
-offset = Vector2( -0.5, 0 )
-script = ExtResource( 31 )
-
-[node name="CItab" parent="CanvasLayer/Inventory/CI" instance=ExtResource( 36 )]
-show_behind_parent = true
-margin_left = -98.1576
-margin_top = -95.9248
-margin_right = -73.0826
-margin_bottom = -68.7328
-texture_normal = SubResource( 19 )
-texture_pressed = SubResource( 20 )
-tab = "Building Blocks"
-
-[node name="CItab2" parent="CanvasLayer/Inventory/CI" instance=ExtResource( 36 )]
-show_behind_parent = true
-margin_left = -68.0095
-margin_top = -96.1235
-margin_right = -42.9345
-margin_bottom = -68.9315
-texture_normal = SubResource( 19 )
-texture_pressed = SubResource( 21 )
-tab = "Decoration Blocks"
-
-[node name="CItab3" parent="CanvasLayer/Inventory/CI" instance=ExtResource( 36 )]
-show_behind_parent = true
-margin_left = -37.8143
-margin_top = -96.0595
-margin_right = -12.7393
-margin_bottom = -68.8675
-texture_normal = SubResource( 19 )
-texture_pressed = SubResource( 21 )
-tab = "Redstone"
-
-[node name="CItab4" parent="CanvasLayer/Inventory/CI" instance=ExtResource( 36 )]
-show_behind_parent = true
-margin_left = -8.19478
-margin_top = -95.7706
-margin_right = 16.8802
-margin_bottom = -68.5786
-texture_normal = SubResource( 19 )
-texture_pressed = SubResource( 21 )
-tab = "Transportation"
-
-[node name="CItab5" parent="CanvasLayer/Inventory/CI" instance=ExtResource( 36 )]
-show_behind_parent = true
-margin_left = -98.1766
-margin_top = 64.4029
-margin_right = -73.1016
-margin_bottom = 91.5949
-texture_normal = SubResource( 22 )
-texture_pressed = SubResource( 23 )
-tab = "Miscellaneous"
-
-[node name="CItab6" parent="CanvasLayer/Inventory/CI" instance=ExtResource( 36 )]
-show_behind_parent = true
-margin_left = -68.1166
-margin_top = 64.2493
-margin_right = -43.0416
-margin_bottom = 91.4413
-texture_normal = SubResource( 22 )
-texture_pressed = SubResource( 24 )
-tab = "Foodstuffs"
-
-[node name="CItab7" parent="CanvasLayer/Inventory/CI" instance=ExtResource( 36 )]
-show_behind_parent = true
-margin_left = -37.9109
-margin_top = 64.0038
-margin_right = -12.8359
-margin_bottom = 91.1958
-texture_normal = SubResource( 22 )
-texture_pressed = SubResource( 24 )
-tab = "Tools"
-
-[node name="CItab8" parent="CanvasLayer/Inventory/CI" instance=ExtResource( 36 )]
-show_behind_parent = true
-margin_left = -8.03419
-margin_top = 64.4003
-margin_right = 17.0408
-margin_bottom = 91.5923
-texture_normal = SubResource( 22 )
-texture_pressed = SubResource( 24 )
-tab = "Combat"
-
-[node name="CItab9" parent="CanvasLayer/Inventory/CI" instance=ExtResource( 36 )]
-show_behind_parent = true
-margin_left = 21.5542
-margin_top = 64.4607
-margin_right = 46.6292
-margin_bottom = 91.6527
-texture_normal = SubResource( 22 )
-texture_pressed = SubResource( 24 )
-tab = "Brewing"
-
-[node name="tabs" type="Node2D" parent="CanvasLayer/Inventory/CI"]
-position = Vector2( 30.7819, 64.5322 )
+[node name="icons" type="Node2D" parent="CanvasLayer/Inventory"]
 
 [node name="craftingTable" type="TextureRect" parent="CanvasLayer"]
 visible = false
@@ -576,6 +478,97 @@ rect_scale = Vector2( 0.25, 0.25 )
 custom_fonts/font = ExtResource( 14 )
 text = "Loading..."
 
+[node name="CI" type="Sprite" parent="CanvasLayer"]
+visible = false
+position = Vector2( 958, 475 )
+scale = Vector2( 4, 4 )
+texture = SubResource( 18 )
+offset = Vector2( -0.5, 0 )
+script = ExtResource( 31 )
+
+[node name="CItab" parent="CanvasLayer/CI" instance=ExtResource( 36 )]
+margin_left = -98.1576
+margin_top = -95.9248
+margin_right = -73.0826
+margin_bottom = -68.7328
+pressed = true
+texture_normal = SubResource( 19 )
+texture_pressed = SubResource( 20 )
+tab = "Building Blocks"
+
+[node name="CItab2" parent="CanvasLayer/CI" instance=ExtResource( 36 )]
+show_behind_parent = true
+margin_left = -68.0095
+margin_top = -96.1235
+margin_right = -42.9345
+margin_bottom = -68.9315
+texture_normal = SubResource( 19 )
+texture_pressed = SubResource( 21 )
+tab = "Decoration Blocks"
+
+[node name="CItab3" parent="CanvasLayer/CI" instance=ExtResource( 36 )]
+show_behind_parent = true
+margin_left = -37.8143
+margin_top = -96.0595
+margin_right = -12.7393
+margin_bottom = -68.8675
+texture_normal = SubResource( 19 )
+texture_pressed = SubResource( 21 )
+tab = "Redstone"
+
+[node name="CItab4" parent="CanvasLayer/CI" instance=ExtResource( 36 )]
+show_behind_parent = true
+margin_left = -8.19478
+margin_top = -95.7706
+margin_right = 16.8802
+margin_bottom = -68.5786
+texture_normal = SubResource( 19 )
+texture_pressed = SubResource( 21 )
+tab = "Transportation"
+
+[node name="CItab5" parent="CanvasLayer/CI" instance=ExtResource( 36 )]
+show_behind_parent = true
+margin_left = -98.1766
+margin_top = 64.4029
+margin_right = -73.1016
+margin_bottom = 91.5949
+texture_normal = SubResource( 22 )
+texture_pressed = SubResource( 23 )
+tab = "Miscellaneous"
+
+[node name="CItab6" parent="CanvasLayer/CI" instance=ExtResource( 36 )]
+show_behind_parent = true
+margin_left = -68.1166
+margin_top = 64.2493
+margin_right = -43.0416
+margin_bottom = 91.4413
+texture_normal = SubResource( 22 )
+texture_pressed = SubResource( 24 )
+tab = "Foodstuffs"
+
+[node name="CItab7" parent="CanvasLayer/CI" instance=ExtResource( 36 )]
+show_behind_parent = true
+margin_left = -37.9109
+margin_top = 64.0038
+margin_right = -12.8359
+margin_bottom = 91.1958
+texture_normal = SubResource( 22 )
+texture_pressed = SubResource( 24 )
+tab = "Tools"
+
+[node name="CItab8" parent="CanvasLayer/CI" instance=ExtResource( 36 )]
+show_behind_parent = true
+margin_left = -8.03419
+margin_top = 64.4003
+margin_right = 17.0408
+margin_bottom = 91.5923
+texture_normal = SubResource( 22 )
+texture_pressed = SubResource( 24 )
+tab = "Combat"
+
+[node name="icons" type="Node2D" parent="CanvasLayer/CI"]
+position = Vector2( 30.7819, 64.5322 )
+
 [node name="entities" type="Node2D" parent="."]
 script = ExtResource( 9 )
 
@@ -588,12 +581,6 @@ wait_time = 0.05
 [node name="DaylightCycle" type="Timer" parent="Lighting"]
 wait_time = 480.0
 one_shot = true
-
-[node name="water" type="Node2D" parent="."]
-script = ExtResource( 30 )
-
-[node name="Timer" type="Timer" parent="water"]
-wait_time = 0.25
 
 [node name="Ambient" type="AudioStreamPlayer" parent="."]
 script = ExtResource( 5 )
@@ -609,11 +596,9 @@ one_shot = true
 [connection signal="world_loaded" from="." to="Player" method="_on_Node2D_world_loaded"]
 [connection signal="world_loaded" from="." to="entities" method="_on_Node2D_world_loaded"]
 [connection signal="world_loaded" from="." to="Lighting" method="_on_Node2D_world_loaded"]
-[connection signal="world_loaded" from="." to="water" method="_on_Node2D_world_loaded"]
 [connection signal="timeout" from="cursor/blockSlowdown" to="cursor" method="_on_blockSlowdown_timeout"]
 [connection signal="timeout" from="cursor/breakingEnd" to="cursor" method="_on_breakingEnd_timeout"]
 [connection signal="pressed" from="CanvasLayer/Menu/Quit" to="." method="_on_Quit_pressed"]
 [connection signal="timeout" from="Lighting/DaylightCycle" to="Lighting" method="_on_Daylight_Cycle_timeout"]
-[connection signal="timeout" from="water/Timer" to="water" method="_on_Timer_timeout"]
 [connection signal="timeout" from="Ambient/Timer" to="Ambient" method="_on_Timer_timeout"]
 [connection signal="timeout" from="Entity" to="entities" method="_on_Entity_timeout"]

@@ -73,10 +73,11 @@ class block:
 	var drops : Array
 	var lightSource : bool
 	var lightEmit : int
+	var waterBreaks : bool
 	var texture : String
 	var soundFiles : String
 	
-	func _init(Name,id,mined,hardness,harvestBy,drop,tex,sound,canLight = false,lightE = 0) -> void:
+	func _init(Name,id,mined,hardness,harvestBy,drop,tex,sound,canLight = false,lightE = 0,waterB = false) -> void:
 		blockName = Name; blockId = id; minedBy = mined; blockHardness = hardness; canHarvest = harvestBy; drops = drop; lightSource = canLight; lightEmit = lightE; texture = tex; soundFiles = sound
 
 func get_json(file : String):
@@ -99,10 +100,13 @@ func _ready():
 	var json_block_data = get_json("block_data.json")
 	for blockData in json_block_data:
 		var data = json_block_data[blockData]
-		if !data.has("light_source"):
-			block_data[int(blockData)] = block.new(data["name"],int(data["id"]),int(data["mined_by"]),data["block_hardness"],data["can_harvest"],data["drops"],data["texture"],data["sound_file_name"])
-		else:
-			block_data[int(blockData)] = block.new(data["name"],int(data["id"]),int(data["mined_by"]),data["block_hardness"],data["can_harvest"],data["drops"],data["texture"],data["sound_file_name"],data["light_source"],data["light_value"])
+		var blockClass = block.new(data["name"],int(data["id"]),int(data["mined_by"]),data["block_hardness"],data["can_harvest"],data["drops"],data["texture"],data["sound_file_name"])
+		if data.has("light_source"):
+			blockClass.lightSource = data["light_source"]
+			blockClass.lightEmit = data["light_value"]
+		if data.has("water_can_break"):
+			blockClass.waterBreaks = data["water_can_break"]
+		block_data[int(blockData)] = blockClass
 	#Loads sound data
 	var json_sound_data = get_json("sound.json")
 	for soundi in json_sound_data:
@@ -163,6 +167,9 @@ func _ready():
 	if globals.new:
 		save_game()
 	emit_signal("start")
+	$CanvasLayer/hotbar.add_to_inventory(41,10)
+	$CanvasLayer/hotbar.add_to_inventory(43,10)
+	$CanvasLayer/hotbar.add_to_inventory(59,10)
 
 # --- save/load ---
 func save_game():
@@ -230,7 +237,8 @@ func create_chunk(chunkX):
 						heights.append(heights[i-1]+int(rand_range(biome["layers"][i][1][0],biome["layers"][i][1][1]+1)))
 					for y in range(chunkSize.y):
 						if y < height and y > WATERLEVEL:
-							chunk[x][y] = 41
+							#chunk[x][y] = 41
+							build_event("build",Vector2(x+(chunkX*chunkSize.x),y),41,1,false)
 						if y >= height:
 							var block = -1
 							for y2 in range(heights.size()):
@@ -396,8 +404,6 @@ func render_done(blocker):
 			var block = BLOCK.instance()
 			if data["type"] == "Water":
 				block = WATER.instance()
-				if !$water.water.has([data["position"]/ Vector2(16,16)+Vector2(blocker[i][2]*16,0),data["z"]]):
-					$water.water[[data["position"]/ Vector2(16,16)+Vector2(blocker[i][2]*16,0),data["z"]]] = 9
 			block.name = data["name"]
 			block.position = data["position"]
 			block.id = data["id"]
@@ -413,12 +419,6 @@ func render_done(blocker):
 					block.lightEmit = 14
 					block.lightSource = true
 			$chunks.get_node(str(blocker[i][2])).add_child(block)
-#		elif blocker[i][0] == "Remove":
-#			if [41,60].has($chunks.get_node(blocker[i][1]).id):
-#				$water.water.erase([blocker[i][2]+Vector2(blocker[i][3]*16,0),blocker[i][4]])
-#			$chunks.get_node(blocker[i][1]).queue_free()
-#			if i < blocker.size()-1 and blocker[i+1][0] == "New" and blocker[i+1][2] == blocker[i][3] and blocker[i+1][1]["position"]/ Vector2(16,16) == blocker[i][2] and blocker[i][4] == blocker[i+1][1]["z"]:
-#				yield(get_tree().create_timer(0.1),"timeout")
 	if chunksLoaded != -1:
 		chunksLoaded += 1
 		if chunksLoaded >= 5:
@@ -479,7 +479,7 @@ func block(action,pos,z=1,test=false): #action: either get or put the block you 
 			else:
 				toPlace[get_chunk(pos.x)] = [[int(action),pos,z]]
 
-func build_event(action,pos,id,z = 1,itemAction = true):
+func build_event(action,pos,id,z = 1,itemAction = true, blockData = {}):
 	var blockAtPos = block("get",pos,z)
 	if action == "break":
 		if [58].has(blockAtPos): #Drops all items the container has when broken
@@ -503,11 +503,17 @@ func build_event(action,pos,id,z = 1,itemAction = true):
 				94:
 					if randi()%50 < 10:
 						$entities.add_item(91,1,pos*Vector2(16,16),false)
+				43:
+					pass
 				_:
 					if data.drops.size() >= 1 and itemAction:
 						for i in range(data.drops.size()):
 							$entities.add_item(data.drops[i][0],int(rand_range(data.drops[i][1][0],data.drops[i][1][1]+1)),pos*Vector2(16,16),false)
 		block("0",pos,z)
+		if $chunks.has_node(str(get_chunk(pos.x)) + "/" + str(z) + "," + str(chunkifyI(pos.x)) + "," + str(pos.y)):
+			$chunks.get_node(str(get_chunk(pos.x)) + "/" + str(z) + "," + str(chunkifyI(pos.x)) + "," + str(pos.y)).queue_free()
+		if interactableBlockData.has([pos,z]):
+			interactableBlockData.erase([pos,z])
 	else:
 		block(str(id),pos,z)
 		match id:
@@ -521,6 +527,10 @@ func build_event(action,pos,id,z = 1,itemAction = true):
 				interactableBlockData[[pos,z]] = false
 			67:
 				interactableBlockData[[pos,z]] = [0,round(rand_range(120,600))]
+			60:
+				interactableBlockData[[pos,z]] = [blockData["level"]]
+			41:
+				interactableBlockData[[pos,z]] = [8]
 		if itemAction:
 			$CanvasLayer/hotbar.remove_from_inventory($CanvasLayer/hotbar/select.selected,1)
 		if action == "41":

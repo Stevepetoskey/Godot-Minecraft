@@ -61,3 +61,7 @@ L: 2
 - Added Golden items (pickaxes, axes, ect...)
 - Added rotten flesh
 - Added grass
+
+## Alpha 4 pre 4
+- Fixed breaking glass crashing the game
+- Added Water system

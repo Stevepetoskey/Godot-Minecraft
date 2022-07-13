@@ -6,7 +6,7 @@ var lightThread = Thread.new() #The lighting thread. This is the seperate thread
 var prePlayerPos = Vector2(0,0) #The position the player was at before the thread started
 
 var lightArray = []
-var transparent = [0,5,41,43,54,58,60,62,63,66,70]
+var transparent = [0,5,41,43,54,58,60,62,63,66,70,94]
 var ambientLevel = 15
 var calls = []
 var callAmount = 0
