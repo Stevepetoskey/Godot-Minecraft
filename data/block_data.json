@@ -468,4 +468,23 @@
 	"texture": "farmland_moist",
 	"sound_file_name": "gravel"
 	},
+"97":{"name": "Stone brick stairs",
+	"id": 97,
+	"mined_by": 2,
+	"block_hardness": 1.5,
+	"can_harvest": ["allType"],
+	"drops": [[97,[1,1]]],
+	"texture": "stairs/stone_brick_stairs0",
+	"sound_file_name": "stone"
+	},
+"98":{"name": "Cobblestone stairs",
+	"id": 98,
+	"mined_by": 2,
+	"block_hardness": 2,
+	"can_harvest": ["allType"],
+	"drops": [[98,[1,1]]],
+	"texture": "stairs/cobblestone_stairs0",
+	"sound_file_name": "stone"
+	},
+
 }

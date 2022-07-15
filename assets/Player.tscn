@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://textures/players/Steve.png" type="Texture" id=1]
 [ext_resource path="res://scripts/Player.gd" type="Script" id=2]
@@ -379,6 +379,12 @@ void fragment() {
 [sub_resource type="ShaderMaterial" id=9]
 shader = SubResource( 8 )
 
+[sub_resource type="RectangleShape2D" id=10]
+extents = Vector2( 3.59002, 1.70661 )
+
+[sub_resource type="RectangleShape2D" id=11]
+extents = Vector2( 2.92849, 1.72232 )
+
 [node name="Player" type="KinematicBody2D"]
 z_index = 1
 collision_layer = 10
@@ -501,9 +507,47 @@ one_shot = true
 [node name="hurt" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 6 )
 
+[node name="stairTestRight" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="stairTestRight"]
+position = Vector2( 3.70601, 7.71624 )
+shape = SubResource( 10 )
+
+[node name="stairTestRight2" type="Area2D" parent="."]
+position = Vector2( 0.188988, 5.32312 )
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="stairTestRight2"]
+position = Vector2( 3.70601, 7.71624 )
+shape = SubResource( 10 )
+
+[node name="stairTestLeft" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="stairTestLeft"]
+position = Vector2( -3.06632, 7.65516 )
+shape = SubResource( 11 )
+
+[node name="stairTestLeft2" type="Area2D" parent="."]
+position = Vector2( -0.125992, 5.38611 )
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="stairTestLeft2"]
+position = Vector2( -3.06632, 7.65516 )
+shape = SubResource( 11 )
+
 [connection signal="timeout" from="hunger" to="." method="_on_hunger_timeout"]
 [connection signal="area_entered" from="BlockTest" to="." method="_on_BlockTest_area_entered"]
 [connection signal="area_exited" from="BlockTest" to="." method="_on_BlockTest_area_exited"]
 [connection signal="timeout" from="hungerEffect" to="." method="_on_Hunger_timeout"]
 [connection signal="timeout" from="Sprint" to="." method="_on_Sprint_timeout"]
 [connection signal="timeout" from="walkEnd" to="." method="_on_walkEnd_timeout"]
+[connection signal="body_entered" from="stairTestRight" to="." method="_on_stairTest_body_entered"]
+[connection signal="body_exited" from="stairTestRight" to="." method="_on_stairTestRight_body_exited"]
+[connection signal="body_entered" from="stairTestRight2" to="." method="_on_stairTestRight2_body_entered"]
+[connection signal="body_exited" from="stairTestRight2" to="." method="_on_stairTestRight2_body_exited"]
+[connection signal="body_entered" from="stairTestLeft" to="." method="_on_stairTestLeft_body_entered"]
+[connection signal="body_exited" from="stairTestLeft" to="." method="_on_stairTestLeft_body_exited"]
+[connection signal="body_entered" from="stairTestLeft2" to="." method="_on_stairTestLeft2_body_entered"]
+[connection signal="body_exited" from="stairTestLeft2" to="." method="_on_stairTestLeft2_body_exited"]

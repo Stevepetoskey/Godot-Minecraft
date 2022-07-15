@@ -1,6 +1,6 @@
 extends Node
 
-const CURRENTVER = "0.4.0 pre 4"
+const CURRENTVER = "0.4.0 pre 5"
 const STABLE = false
 
 var savegame = File.new() #file

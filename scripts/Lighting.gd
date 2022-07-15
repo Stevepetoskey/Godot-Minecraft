@@ -7,6 +7,7 @@ var prePlayerPos = Vector2(0,0) #The position the player was at before the threa
 
 var lightArray = []
 var transparent = [0,5,41,43,54,58,60,62,63,66,70,94]
+var solidTrans = [53,80,97,98]
 var ambientLevel = 15
 var calls = []
 var callAmount = 0
@@ -118,7 +119,7 @@ func thread_done(threadLight):
 					get_node("../chunks").get_node(str(main.get_chunk(pos.x))).get_node(str(get_layer(pos,true))+","+str(main.chunkify(pos).x)+","+str(pos.y)+"/Sprite").material.set_shader_param("shade",lightArray[x][y]/15.0)
 #					if main.block("get",pos) == 54:
 #						print(get_layer(pos) > 0, " , ", (transparent.has(main.block("get",pos)) or main.block("get",pos) == 53) , " , ", !transparent.has(main.block("get",pos,0)))
-					if get_node("../chunks").get_node(str(main.get_chunk(pos.x))).has_node("0,"+str(main.chunkify(pos).x)+","+str(pos.y)) and get_layer(pos,true) > 0 and (transparent.has(main.block("get",pos)) or main.block("get",pos) == 53) and !transparent.has(main.block("get",pos,0)):
+					if get_node("../chunks").get_node(str(main.get_chunk(pos.x))).has_node("0,"+str(main.chunkify(pos).x)+","+str(pos.y)) and get_layer(pos,true) > 0 and (transparent.has(main.block("get",pos)) or solidTrans.has(main.block("get",pos))) and !transparent.has(main.block("get",pos,0)):
 						get_node("../chunks").get_node(str(main.get_chunk(pos.x))).get_node("0"+","+str(main.chunkify(pos).x)+","+str(pos.y)+"/Sprite").material.set_shader_param("shade",lightArray[x][y]/15.0)
 
 func _on_Daylight_Cycle_timeout():

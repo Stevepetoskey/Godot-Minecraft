@@ -7,7 +7,7 @@ const BLOCK = preload("res://assets/block.tscn")
 const BLOCKSHADER = preload("res://shaders/block.tres")
 const WATERSHADER = preload("res://shaders/Water.tres")
 const WATER = preload("res://assets/Water.tscn")
-const INTERACTABLE_BLOCK = [23,57,62,63,67]
+const INTERACTABLE_BLOCK = [23,57,62,63,67,97,98]
 const BIOME_TYPES = {
 	"Plains":{"id":0,"layers":[[1,[1,1]],[2,[2,3]]],"trees":["normal","birch"]},
 	"Forest":{"id":1,"layers":[[1,[1,1]],[2,[2,3]]],"trees":["normal","birch"]},
@@ -17,7 +17,6 @@ const BIOME_TYPES = {
 	"Frozen Forest":{"id":5,"layers":[[2,[3,4]]],"trees":["spruce","spruce2"]},
 	}
 
-var chestData = [[],[]]
 var newData = {"Entity":[],"Player":[Vector2(0,0),20,600,Vector2(0,0),false,0,true]}
 
 var chunks = {} #ChunkX: [Foreground,background,modified,already Spawned]
@@ -121,7 +120,7 @@ func _ready():
 		print("loaded")
 		var data = globals.read_savegame()
 		chunks = data["World"]
-		$CanvasLayer/hotbar.inventory = data["Inventory"]
+		$CanvasLayer/Inventory.inventory = data["Inventory"]
 		interactableBlockData = data["InteractBlocks"]
 		if data.has("Entity"):
 			$entities.entities = data["Entity"].duplicate(true)
@@ -147,15 +146,10 @@ func _ready():
 		$Lighting.playerLoaded = true
 	else:
 		for _i in range(36):
-			$CanvasLayer/hotbar.inventory[0].append(0)
-			$CanvasLayer/hotbar.inventory[1].append(0)
-			$CanvasLayer/hotbar.inventory[2].append([])
+			$CanvasLayer/Inventory.inventory.append({"id":0,"amount":0,"data":{}})
 		worldSeed = globals.worldSeed
 		worldType = globals.worldType
 		$entities.entities = newData["Entity"]
-	for _i in range(27):
-		chestData[0].append(0)
-		chestData[1].append(0)
 	seed(worldSeed)
 	if worldType == "Flat":
 		$Lighting.lostLevel = 128
@@ -164,12 +158,11 @@ func _ready():
 	temps.seed = randi()
 	precip.seed = randi()
 	update_chunks(player.playerChunk)
+	if globals.gamemode == "Creative":
+		get_node("CanvasLayer/Bars").hide()
 	if globals.new:
 		save_game()
 	emit_signal("start")
-	$CanvasLayer/hotbar.add_to_inventory(41,10)
-	$CanvasLayer/hotbar.add_to_inventory(43,10)
-	$CanvasLayer/hotbar.add_to_inventory(59,10)
 
 # --- save/load ---
 func save_game():
@@ -178,7 +171,7 @@ func save_game():
 	var data = {}
 	data["Seed"] = worldSeed
 	data["World"] = chunks
-	data["Inventory"] = $CanvasLayer/hotbar.inventory
+	data["Inventory"] = $CanvasLayer/Inventory.inventory
 	data["Seed"] = worldSeed
 	data["InteractBlocks"] = interactableBlockData
 	if !get_node("entities").saved:
@@ -394,7 +387,7 @@ func render_chunk(chunkX,block):
 			var xPos = x + chunkX*chunkSize.x
 			if xPos < playerPos.x + LOADRECT.x and xPos > playerPos.x - LOADRECT.x and y < playerPos.y + LOADRECT.y and y > playerPos.y - LOADRECT.y: 
 				load_block(chunks[chunkX][1],chunkX,x,y,1,block)
-				if block("get",Vector2(xPos,y)) == 0 or ((transparent.has(block("get",Vector2(xPos,y))) or block("get",Vector2(xPos,y)) == 53) and !transparent.has(block("get",Vector2(xPos,y),0))):
+				if block("get",Vector2(xPos,y)) == 0 or ((transparent.has(block("get",Vector2(xPos,y))) or $Lighting.solidTrans.has(block("get",Vector2(xPos,y)))) and !transparent.has(block("get",Vector2(xPos,y),0))):
 					load_block(chunks[chunkX][0],chunkX,x,y,0,block)
 
 func render_done(blocker):
@@ -417,6 +410,9 @@ func render_done(blocker):
 			match data["id"]: #Setting up light sources
 				53:
 					block.lightEmit = 14
+					block.lightSource = true
+				80:
+					block.lightEmit = 8
 					block.lightSource = true
 			$chunks.get_node(str(blocker[i][2])).add_child(block)
 	if chunksLoaded != -1:
@@ -482,10 +478,11 @@ func block(action,pos,z=1,test=false): #action: either get or put the block you 
 func build_event(action,pos,id,z = 1,itemAction = true, blockData = {}):
 	var blockAtPos = block("get",pos,z)
 	if action == "break":
-		if [58].has(blockAtPos): #Drops all items the container has when broken
+		if [58,23].has(blockAtPos): #Drops all items the container has when broken
 			var items = interactableBlockData[[get_node("cursor").position/ Vector2(16,16),z]]
-			for i in range(items[0].size()):
-				$entities.add_item(items[0][i],items[1][i],pos*Vector2(16,16),false)
+			for i in range(items.size()):
+				if typeof(items[i]) == TYPE_DICTIONARY:
+					$entities.add_item(items[i]["id"],items[i]["amount"],pos*Vector2(16,16),false)
 		if get_node("CanvasLayer/hotbar").can_harvest(blockAtPos):
 			var data = block_data[blockAtPos]
 			match blockAtPos:
@@ -518,11 +515,11 @@ func build_event(action,pos,id,z = 1,itemAction = true, blockData = {}):
 		block(str(id),pos,z)
 		match id:
 			23: #furnace data
-				interactableBlockData[[pos,z]] = [[0,0,0],[0,0,0],0,0,0] #[[[top id,bottom id,result id],[top num, bottom num, result num]],process,time spent]
+				interactableBlockData[[pos,z]] = [{"id":0,"amount":0,"data":{}},{"id":0,"amount":0,"data":{}},{"id":0,"amount":0,"data":{}},0,0,0,0] #[top item, bottom item, result,process,time spent,currentFuel]
 			57: #sapling data
 				interactableBlockData[[pos,z]] = [0,round(rand_range(120,600))] #[age (120-600 seconds),life]
 			58:
-				interactableBlockData[[pos,z]] = chestData.duplicate(true)
+				interactableBlockData[[pos,z]] = get_node("CanvasLayer/Inventory").chestData.duplicate(true)
 			62,63:
 				interactableBlockData[[pos,z]] = false
 			67:
@@ -531,12 +528,32 @@ func build_event(action,pos,id,z = 1,itemAction = true, blockData = {}):
 				interactableBlockData[[pos,z]] = [blockData["level"]]
 			41:
 				interactableBlockData[[pos,z]] = [8]
+			97,98:
+				var rot
+				if get_global_mouse_position().x > player.global_position.x:
+					if get_global_mouse_position().y < $cursor.position.y:
+						rot = 2
+					else:
+						rot = 3
+				else:
+					if get_global_mouse_position().y < $cursor.position.y:
+						rot = 1
+					else:
+						rot = 0
+				interactableBlockData[[pos,z]] = [rot]
 		if itemAction:
 			$CanvasLayer/hotbar.remove_from_inventory($CanvasLayer/hotbar/select.selected,1)
 		if action == "41":
 			$CanvasLayer/hotbar.add_to_inventory(59,1)
 	chunks[get_chunk(pos.x)][2] = true #Makes it so chunk is stored in storage even when unloaded
 	load_chunk(get_chunk(pos.x))
+#	print(get_node("CanvasLayer/Inventory").inventory)
+
+func player_died():
+	for item in get_node("CanvasLayer/Inventory").inventory:
+		if item["id"] != 0:
+			get_node("entities").add_item(item["id"],item["amount"],player.position,true)
+	$CanvasLayer/Dead.show()
 
 func _exit_tree():
 	if renderThread.is_active():
@@ -547,3 +564,15 @@ func _on_Quit_pressed():
 	yield($CanvasLayer/Menu/click,"finished")
 	save_game()
 	get_tree().change_scene("res://scene/Menu.tscn")
+
+func _on_Save_pressed():
+	save_game()
+
+func _on_Respawn_pressed():
+	player.get_node("CollisionShape2D").disabled = false
+	player.go_to_spawn()
+	player.dead = false
+	player.hunger = 20
+	player.saturation = 5
+	player.health = 20
+	$CanvasLayer/Dead.hide()

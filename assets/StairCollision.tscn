@@ -1,0 +1,4 @@
+[gd_scene format=2]
+
+[node name="StairCollision" type="CollisionPolygon2D"]
+polygon = PoolVector2Array( -8, 8, 8, 8, 8, 0, 0, 0, 0, -8, -8, -8 )

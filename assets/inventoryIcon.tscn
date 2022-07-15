@@ -23,9 +23,6 @@ custom_constants/shadow_offset_y = 5
 custom_fonts/font = ExtResource( 3 )
 text = "64"
 align = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [connection signal="mouse_entered" from="." to="." method="_on_inventoryIcon_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_inventoryIcon_mouse_exited"]

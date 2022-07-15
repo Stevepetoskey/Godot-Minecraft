@@ -10,10 +10,9 @@ func noZero(val):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if visible and get_node("../Inventory").currentFurnace[3] > 0:
-		$progress.value = get_node("../Inventory").currentFurnace[2]
-		print(get_node("../Inventory").currentFurnace[3], " , ",float(get_node("../Inventory").currentFurnace[4]), " , ",get_node("../Inventory").currentFurnace[3]/float(noZero(get_node("../Inventory").currentFurnace[2]))/14)
-		$fire.value = (get_node("../Inventory").currentFurnace[3]/float(noZero(get_node("../Inventory").currentFurnace[2])))/14
+	if visible and get_node("../Inventory").currentFurnace[4] > 0:
+		$progress.value = get_node("../Inventory").currentFurnace[3]
+		$fire.value = (get_node("../Inventory").currentFurnace[4]/float(get_node("../Inventory").currentFurnace[5]))*14
 	else:
 		$progress.value = 0
 		$fire.value = 0

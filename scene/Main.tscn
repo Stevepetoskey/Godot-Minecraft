@@ -425,9 +425,6 @@ margin_right = 13.0
 margin_bottom = 15.0
 rect_scale = Vector2( 122, 70 )
 texture = ExtResource( 27 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Quit" type="TextureButton" parent="CanvasLayer/Menu"]
 margin_left = 560.0
@@ -455,8 +452,113 @@ text = "Quit To Menu"
 align = 1
 valign = 1
 
+[node name="Save" type="TextureButton" parent="CanvasLayer/Menu"]
+margin_left = 560.0
+margin_top = 420.0
+margin_right = 760.0
+margin_bottom = 440.0
+rect_scale = Vector2( 4, 4 )
+texture_normal = SubResource( 10 )
+texture_pressed = SubResource( 11 )
+texture_hover = SubResource( 12 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="CanvasLayer/Menu/Save"]
+margin_top = 0.116104
+margin_right = 668.0
+margin_bottom = 66.1161
+rect_scale = Vector2( 0.3, 0.3 )
+custom_colors/font_color_shadow = Color( 0.34902, 0.34902, 0.34902, 1 )
+custom_constants/shadow_offset_x = 4
+custom_constants/shadow_offset_y = 4
+custom_fonts/font = ExtResource( 14 )
+text = "Save Game"
+align = 1
+valign = 1
+
 [node name="click" type="AudioStreamPlayer" parent="CanvasLayer/Menu"]
 stream = ExtResource( 32 )
+
+[node name="Dead" type="Control" parent="CanvasLayer"]
+visible = false
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/Dead"]
+modulate = Color( 0.752941, 0.0352941, 0.0352941, 0.470588 )
+margin_left = -3.0
+margin_top = -1.0
+margin_right = 13.0
+margin_bottom = 15.0
+rect_scale = Vector2( 122, 70 )
+texture = ExtResource( 27 )
+
+[node name="Quit" type="TextureButton" parent="CanvasLayer/Dead"]
+margin_left = 560.0
+margin_top = 550.0
+margin_right = 760.0
+margin_bottom = 570.0
+rect_scale = Vector2( 4, 4 )
+texture_normal = SubResource( 10 )
+texture_pressed = SubResource( 11 )
+texture_hover = SubResource( 12 )
+
+[node name="Label" type="Label" parent="CanvasLayer/Dead/Quit"]
+margin_top = 0.116104
+margin_right = 668.0
+margin_bottom = 66.1161
+rect_scale = Vector2( 0.3, 0.3 )
+custom_colors/font_color_shadow = Color( 0.34902, 0.34902, 0.34902, 1 )
+custom_constants/shadow_offset_x = 4
+custom_constants/shadow_offset_y = 4
+custom_fonts/font = ExtResource( 14 )
+text = "Quit To Menu"
+align = 1
+valign = 1
+
+[node name="Respawn" type="TextureButton" parent="CanvasLayer/Dead"]
+margin_left = 560.0
+margin_top = 420.0
+margin_right = 760.0
+margin_bottom = 440.0
+rect_scale = Vector2( 4, 4 )
+texture_normal = SubResource( 10 )
+texture_pressed = SubResource( 11 )
+texture_hover = SubResource( 12 )
+
+[node name="Label" type="Label" parent="CanvasLayer/Dead/Respawn"]
+margin_top = 0.116104
+margin_right = 668.0
+margin_bottom = 66.1161
+rect_scale = Vector2( 0.3, 0.3 )
+custom_colors/font_color_shadow = Color( 0.34902, 0.34902, 0.34902, 1 )
+custom_constants/shadow_offset_x = 4
+custom_constants/shadow_offset_y = 4
+custom_fonts/font = ExtResource( 14 )
+text = "Respawn"
+align = 1
+valign = 1
+
+[node name="click" type="AudioStreamPlayer" parent="CanvasLayer/Dead"]
+stream = ExtResource( 32 )
+
+[node name="Label" type="Label" parent="CanvasLayer/Dead"]
+margin_left = -2.0
+margin_top = 101.0
+margin_right = 973.0
+margin_bottom = 151.0
+rect_scale = Vector2( 2, 2 )
+custom_colors/font_color_shadow = Color( 0.270588, 0.270588, 0.270588, 1 )
+custom_constants/shadow_offset_x = 4
+custom_constants/shadow_offset_y = 4
+custom_fonts/font = ExtResource( 14 )
+text = "You died!"
+align = 1
 
 [node name="Loading" type="TextureRect" parent="CanvasLayer"]
 visible = false
@@ -569,6 +671,8 @@ tab = "Combat"
 [node name="icons" type="Node2D" parent="CanvasLayer/CI"]
 position = Vector2( 30.7819, 64.5322 )
 
+[node name="invIcons" type="Node2D" parent="CanvasLayer/CI"]
+
 [node name="entities" type="Node2D" parent="."]
 script = ExtResource( 9 )
 
@@ -599,6 +703,9 @@ one_shot = true
 [connection signal="timeout" from="cursor/blockSlowdown" to="cursor" method="_on_blockSlowdown_timeout"]
 [connection signal="timeout" from="cursor/breakingEnd" to="cursor" method="_on_breakingEnd_timeout"]
 [connection signal="pressed" from="CanvasLayer/Menu/Quit" to="." method="_on_Quit_pressed"]
+[connection signal="pressed" from="CanvasLayer/Menu/Save" to="." method="_on_Save_pressed"]
+[connection signal="pressed" from="CanvasLayer/Dead/Quit" to="." method="_on_Quit_pressed"]
+[connection signal="pressed" from="CanvasLayer/Dead/Respawn" to="." method="_on_Respawn_pressed"]
 [connection signal="timeout" from="Lighting/DaylightCycle" to="Lighting" method="_on_Daylight_Cycle_timeout"]
 [connection signal="timeout" from="Ambient/Timer" to="Ambient" method="_on_Timer_timeout"]
 [connection signal="timeout" from="Entity" to="entities" method="_on_Entity_timeout"]

@@ -8,16 +8,17 @@
 - add entities (Sheep, Creeper)
 - add bow with camera that moves with cursor to extent
 - Wheat (pre 3)
-- water acts like water
-- Gamemodes (Creative, Survival)
+- water acts like water (pre 4)
+- Gamemodes (Creative, Survival) (pre 5)
 - redstone dust (pre 3)
 - Menu needs to look better
 - redstone (release tbd)
+- Add height limit (pre 5)
 
 BUGS THAT NEED FIXING
 - block rendering engine seems to be held together with duct tape and not as optimized as it could be
-- rework inventory system
-- fix furnaces not dropping items
+- rework inventory system (pre 5)
+- fix furnaces not dropping items (pre 5)
 
 O: 4
 Period: 15
@@ -47,9 +48,11 @@ L: 2
 - Added caves
 - Better World Generation
 - Set biomes
+- Added Sound effects (breaking,placing,walking ect...)
+- Added more music
 
 ## Alpha 4 pre 2
-- Fixed light not rendering after loading world
+- Fixed light some times not rendering after loading world
 
 ## Alpha 4 pre 3
 - Added redstone
@@ -65,3 +68,14 @@ L: 2
 ## Alpha 4 pre 4
 - Fixed breaking glass crashing the game
 - Added Water system
+
+## Alpha 4 pre 5
+- Fixed right clicking on slots in inventory sometimes having unexpected results
+- Rewrote inventory system to make it more legible and less chaotic
+- Fixed furnace fire GUI not displaying the proper time left until fire runs out
+- Fixed furnace not dropping items when broken
+- Fixed being able to place blocks out of the world
+- Added creative inventory
+- Fixed items immediately collecting once dropped
+- When your health drops to zero, you die
+- Added stonebrick and cobblestone stairs

@@ -8,7 +8,7 @@ var lightEmit = 0
 
 var shadeRotations = [90,180,0,270] #[left,top,bottom,right]
 
-var data = {}
+var data = []
 var containsData = false
 var smeltable = {}
 var fuel = {}
@@ -51,7 +51,7 @@ func render():
 			smeltable = get_node("../../../CanvasLayer/furnace").smeltable
 			fuel = get_node("../../../CanvasLayer/furnace").fuel
 			update_Furnace()
-		41,53:
+		41,53,80:
 			$CollisionShape2D.disabled = true
 		54,67,71:
 			$CollisionShape2D.disabled = true
@@ -66,31 +66,39 @@ func render():
 		94:
 			$CollisionShape2D.disabled = true
 			$Sprite.material.set_shader_param("color",Color(0.25,0.56,0.11,1.0))
+		97,98:
+			var file = "stone_brick_stairs"
+			match id:
+				98:
+					file = "cobblestone_stairs"
+			$Sprite.texture = load("res://textures/Blocks/stairs/" + str(file) + str(data[0])+ ".png")
+			if z != 0:
+				$CollisionShape2D.disabled = true
+				var collision = load("res://assets/StairCollision.tscn").instance()
+				collision.rotation_degrees = data[0]*90
+				add_child(collision)
 	rendered = true
 
 func update_Furnace():
 	if !smelting:
-#		print(main.interactableBlockData)
-#		print(global_position/ Vector2(16,16))
-#		print(data)
-#		print(id)
-		if data[2] != 0 and smeltable.has(data[0][0]):
+		if data[3] != 0 and smeltable.has(data[0]["id"]):
 			$FurnaceFuel.start()
 			$FurnaceTop.start(10/22.0)
 			smelting = true
 		else:
-			if smeltable.has(data[0][0]) and fuel.has(data[0][1]) and (smeltable[data[0][0]] == data[0][2] or data[0][2] == 0):
-				data[3] = fuel[data[0][1]]
+			if smeltable.has(data[0]["id"]) and fuel.has(data[1]["id"]) and (smeltable[data[0]["id"]] == data[2]["id"] or data[2]["id"] == 0):
+				data[4] = fuel[data[1]["id"]]
+				data[5] = fuel[data[1]["id"]]
 				remove_item(1)
-			if data[3] > 0:
+			if data[4] > 0:
 				$FurnaceFuel.start()
 				$FurnaceTop.start(10/22.0)
 				smelting = true
-	elif data[0][0] != isSmelting:
-		if smeltable.has(data[0][0]) and (smeltable[data[0][0]] == data[0][2] or data[0][2] == 0):
-			data[2] = 0
+	elif data[0]["id"] != isSmelting:
+		if smeltable.has(data[0]["id"]) and (smeltable[data[0]["id"]] == data[2]["id"] or data[2]["id"] == 0):
+			data[3] = 0
 			$FurnaceTop.start(10/22.0)
-	isSmelting = data[0][0]
+	isSmelting = data[0]["id"]
 	$Sprite.texture = [load("res://textures/Blocks/furnace_front.png"),load("res://textures/Blocks/furnace_front_on.png")][int(smelting)]
 
 func on_update():
@@ -104,26 +112,26 @@ func on_update():
 			for y in range(-1,2):
 				if abs(x) != abs(y):
 					var block = get_node("../../..").block("get",global_position/ Vector2(16,16) + Vector2(x,y))
-					if block != null and block > 0 and ![53,54,62,63,41,60,94].has(block) and !has_node(str(x) + str(y)):
+					if block != null and block > 0 and ![53,54,62,63,41,60,94,80].has(block) and !has_node(str(x) + str(y)):
 						var sprite = Sprite.new()
 						sprite.texture = load("res://textures/Blocks/BackgroundShade.png")
 						sprite.rotation_degrees = shadeRotations[i]
 						sprite.name = str(x)+str(y)
 						add_child(sprite)
-					if [0,53,54,62,63,41,60,94].has(block) and has_node(str(x) + str(y)):
+					if [0,53,54,62,63,41,60,94,80].has(block) and has_node(str(x) + str(y)):
 						get_node(str(x) + str(y)).queue_free()
 					i+=1
 
 func remove_item(loc):
-	data[1][loc] -= 1
-	if data[1][loc] <= 0:
-		data[0][loc] = 0
+	data[loc]["amount"] -= 1
+	if data[loc]["amount"] <= 0:
+		data[loc]["id"] = 0
 
 func _on_FurnaceFuel_timeout():
-	data[3] -= 1
-	if data[3] <= 0:
-		if fuel.has(data[0][1]) and smeltable.has(data[0][0]):
-			data[3] = fuel[data[0][1]]
+	data[4] -= 1
+	if data[4] <= 0:
+		if fuel.has(data[1]["id"]) and smeltable.has(data[0]["id"]):
+			data[4] = fuel[data[1]["id"]]
 			remove_item(1)
 			$FurnaceFuel.start()
 		else:
@@ -132,19 +140,19 @@ func _on_FurnaceFuel_timeout():
 		$FurnaceFuel.start()
 
 func _on_FurnaceTop_timeout():
-	if smelting and data[0][0] > 0 and (smeltable[data[0][0]] == data[0][2] or data[0][2] == 0):
-		data[2] += 1
-		if data[2] >= 22: #When item has finished smelting
-			data[0][2] = smeltable[data[0][0]]
-			data[1][2] += 1
+	if smelting and data[0]["id"] > 0 and (smeltable[data[0]["id"]] == data[2]["id"] or data[2]["id"] == 0):
+		data[3] += 1
+		if data[3] >= 22: #When item has finished smelting
+			data[2]["id"] = smeltable[data[0]["id"]]
+			data[2]["amount"] += 1
 			remove_item(0)
-			data[2] = 0
+			data[3] = 0
 		$FurnaceTop.start(10/22.0)
-	elif data[2] > 0:
-		data[2] -= 2
+	elif data[3] > 0:
+		data[3] -= 2
 		$FurnaceTop.start(10/22.0)
 	else:
-		data[2] = 0
+		data[3] = 0
 
 func _on_Sapling_timeout():
 	data[0] += 1

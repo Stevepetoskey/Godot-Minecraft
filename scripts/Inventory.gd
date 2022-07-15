@@ -3,7 +3,8 @@ extends Node2D
 const ALL_PLANKS = -1
 const PLANK_TYPES = [65,8,69]
 
-var holdingItem = false
+var holding = false
+var holdingData = {}
 var rightDown = false
 var spaceUsed = []
 var recipes = [[[[Vector2(0,0),4]],[8,4]], #Oak log
@@ -65,242 +66,150 @@ var recipes = [[[[Vector2(0,0),4]],[8,4]], #Oak log
 [[[Vector2(0, 0),75],[Vector2(1, 0),75],[Vector2(1, 1),9],[Vector2(1, 2),9]], [89, 1]], #Gold hoe
 [[[Vector2(0, 0),75],[Vector2(1, 0),75],[Vector2(0, 1),9],[Vector2(0, 2),9]], [89, 1]], #Gold hoe mirror
 [[[Vector2(0, 0),92],[Vector2(1, 0),92],[Vector2(2, 0),92]], [93, 1]], #bread
+[[[Vector2(0, 0),52],[Vector2(-1, 1),52],[Vector2(0, 1),52],[Vector2(-2, 2),52],[Vector2(-1, 2),52],[Vector2(0, 2),52]], [97, 1]], #Stone Brick stairs
+[[[Vector2(0, 0),52],[Vector2(0, 1),52],[Vector2(1, 1),52],[Vector2(0, 2),52],[Vector2(1, 2),52],[Vector2(2, 2),52]], [97, 1]], #Stone Brick stairs mirrored
 ] #[[item1[pos (to orgin),id],item2,ect],[result id,result num]]
-var crafted = 0
-var made = false
+var crafted = 0 #the recipe id
+var made = false #wether a recipe has been made
 var currentFurnace
 var currentChest
+
+var emptyItem = {"id":0,"amount":0,"data":{}}
+
+var chestData = []
+
+var inventory = []
+var inventoryCraft = []
+var craftingTable = []
+
+onready var globals = get_node("/root/GlobalScript")
 
 signal updateFurnace
 
 func _ready():
-	#main inventory
-	var loc = 0
-	for y in range(3,-1,-1):
+	for i in range(27):
+		chestData.append(emptyItem.duplicate(true))
+	#hotbar
+	for loc in range(9):
+		var icon = load("res://assets/inventoryIcon.tscn").instance()
+		icon.loc = loc
+		icon.rect_position = Vector2(loc*18-79,59)
+		icon.main = self
+		icon.type = "inventory"
+		$icons.add_child(icon)
+	var iconId = 9
+	#inventory
+	for y in range(3):
 		for x in range(9):
 			var icon = load("res://assets/inventoryIcon.tscn").instance()
-			icon.id = loc
+			icon.loc = iconId
+			icon.rect_position = Vector2(x*18-79,y*18+2)
 			icon.main = self
-			if loc < 9:
-				icon.rect_position = Vector2(x*18-79,y*18+6)
-			else:
-				icon.rect_position = Vector2(x*18-79,y*18+2)
-			icon.clickable = true
-			icon.inventoryLoc = "../../../hotbar"
+			icon.type = "inventory"
 			$icons.add_child(icon)
-			loc += 1
+			iconId += 1
 	#inventory crafting
-	loc = 0
+	iconId = 0
 	for y in range(2):
 		for x in range(2):
+			inventoryCraft.append({"id":0,"amount":0,"data":{}})
 			var icon = load("res://assets/inventoryIcon.tscn").instance()
-			icon.id = loc
+			icon.loc = iconId
 			icon.main = self
-			icon.type = "ic"
+			icon.type = "inventoryCraft"
 			icon.rect_position = Vector2(x*18+11,y*18-64)
-			icon.clickable = true
-			icon.inventoryLoc = "../../../hotbar"
 			$icons.add_child(icon)
-			loc += 1
+			iconId += 1
 	#inventory crafting result
 	var icon = load("res://assets/inventoryIcon.tscn").instance()
-	icon.id = 0
+	icon.loc = 0
 	icon.main = self
-	icon.type = "icr"
+	icon.type = "inventoryCraftResult"
 	icon.rect_position = Vector2(66.5,-54)
-	icon.clickable = true
-	icon.inventoryLoc = "../../../hotbar"
-	icon.texture_normal = load("res://textures/Blocks/bedrock.png")
 	$icons.add_child(icon)
 	#crafting table
-	loc = 0
+	iconId = 0
 	for y in range(3):
 		for x in range(3):
+			craftingTable.append({"id":0,"amount":0,"data":{}})
 			var tableIcon = load("res://assets/inventoryIcon.tscn").instance()
-			tableIcon.id = loc
-			tableIcon.type = "ct"
+			tableIcon.loc = iconId
+			tableIcon.type = "craftingTable"
 			tableIcon.main = self
 			tableIcon.rect_position = Vector2(x*18+31,y*18+17.5)
-			tableIcon.clickable = true
-			tableIcon.inventoryLoc = "../../hotbar"
 			get_node("../craftingTable").add_child(tableIcon)
-			loc += 1
+			iconId += 1
+	#crafting table result
 	var tableIcon = load("res://assets/inventoryIcon.tscn").instance()
-	tableIcon.id = 0
-	tableIcon.type = "ctr"
+	tableIcon.loc = 0
+	tableIcon.type = "craftingTableResult"
 	tableIcon.main = self
 	tableIcon.rect_position = Vector2(122,34)
-	tableIcon.clickable = true
-	tableIcon.inventoryLoc = "../../hotbar"
 	get_node("../craftingTable").add_child(tableIcon)
 	#furnace
 	for i in range(3):
 		var furnaceIcon = load("res://assets/inventoryIcon.tscn").instance()
-		furnaceIcon.id = i
+		furnaceIcon.loc = i
 		match i:
 			0:
-				furnaceIcon.type = "ft"
+				furnaceIcon.type = "furnace"
 				furnaceIcon.rect_position = Vector2(57,18)
 			1:
-				furnaceIcon.type = "fb"
+				furnaceIcon.type = "furnace"
 				furnaceIcon.rect_position = Vector2(57,54)
 			2:
-				furnaceIcon.type = "fr"
+				furnaceIcon.type = "furnaceResult"
 				furnaceIcon.rect_position = Vector2(115,34)
 				furnaceIcon.rect_scale = Vector2(1.2,1.2)
 		furnaceIcon.main = self
-		furnaceIcon.clickable = true
-		furnaceIcon.inventoryLoc = "../../hotbar"
 		get_node("../furnace").add_child(furnaceIcon)
 	#small chest
-	loc = 0
+	iconId = 0
 	for y in range(3):
 		for x in range(9):
 			var chestIcon = load("res://assets/inventoryIcon.tscn").instance()
-			chestIcon.id = loc
-			chestIcon.type = "sc"
+			chestIcon.loc = iconId
+			chestIcon.type = "chest"
 			chestIcon.main = self
 			chestIcon.rect_position = Vector2(x*18+9,y*18+19)
-			chestIcon.clickable = true
-			chestIcon.inventoryLoc = "../../hotbar"
 			get_node("../chestSmall").add_child(chestIcon)
-			loc += 1
+			iconId += 1
 
 func _process(delta):
 	if Input.is_action_just_pressed("inventory"):
 		if visible:
-			get_node("../craftingTable").visible = false
-			get_node("../furnace").visible = false
+			get_node("../craftingTable").hide()
+			get_node("../furnace").hide()
 			if get_node("../chestSmall").visible:
 				var cursor = get_node("../../cursor")
 				get_node("../../chunks").get_node(str(get_node("../..").get_chunk(cursor.position.x/16))).get_node(str(cursor.z) + "," + str(get_node("../..").chunkifyI(cursor.position.x/16)) + "," + str(cursor.position.y/16)).interact(false)
-			get_node("../chestSmall").visible = false
+			get_node("../chestSmall").hide()
+			$Inventory.show()
+			$icons.show()
+			get_node("../CI").hide()
+		else:
+			if globals.gamemode == "Creative":
+				$Inventory.hide()
+				$icons.hide()
+				get_node("../CI").show()
 		visible = !visible
-		if holdingItem:
-			get_node("../../entities").add_item($iconCursor.itemID,$iconCursor.itemNum,get_node("../../Player").position,true)
-			holdingItem = false
-			$iconCursor.visible = false
-			$iconCursor.itemNum = 0
-			$iconCursor.itemID = 0
-		var invCraft = get_node("../hotbar").inventoryCraft
-		for i in range(invCraft[0].size()):
-			if invCraft[0][i] > 0:
-				get_node("../../entities").add_item(invCraft[0][i],invCraft[1][i],get_node("../../Player").position,true)
-				invCraft[0][i] = 0
-				invCraft[1][i] = 0
-	$iconCursor.visible = holdingItem
-#	if Input.is_action_just_released("jump"):
-#		rightDown = false
-#		spaceUsed = []
-
-func remove_item(array,id,amount):
-	if array[1][id]-amount< 1:
-		array[1][id] = 0
-		array[0][id] = 0
-	else:
-		array[1][id] -= amount
-
-func icon_clicked(id,type,click,hold=false,pos=Vector2(0,0)):
-	if !rightDown or (rightDown and !spaceUsed.has([id,type])):
-		if hold:
-			rightDown = true
-			spaceUsed.append([id,type])
-		else:
-			rightDown = false
-			spaceUsed = []
-		var selected = get_node("../hotbar").inventory
-		match type:
-			"ic":
-				selected = get_node("../hotbar").inventoryCraft
-			"icr", "ctr":
-				selected = recipes[crafted][1]
-			"ct":
-				selected = get_node("../hotbar").craftingTable
-			"ft","fb","fr":
-				selected = currentFurnace
-			"sc":
-				selected = currentChest
-		if holdingItem:
-			if ["icr","ctr"].has(type) and $iconCursor.itemID == selected[0] and click != "right":
-				if $iconCursor.itemNum + selected[1] > 64:
-					$iconCursor.itemNum = 64
-					selected[1] -= 64-$iconCursor.itemNum
-				else:
-					$iconCursor.itemNum += selected[1]
-			elif !["icr","ctr"].has(type) and type == "fr" and selected[0][id] > 0 and $iconCursor.itemID == selected[0][id]:
-				if $iconCursor.itemNum + selected[1][id] > 64:
-					$iconCursor.itemNum = 64
-					remove_item(selected,id,64-$iconCursor.itemNum)
-				else:
-					$iconCursor.itemNum += selected[1][id]
-					remove_item(selected,id,selected[1][id])
-			elif !["icr","ctr","fr"].has(type):
-				if selected[0][id] == $iconCursor.itemID and selected[0][id] > 0:
-					if click == "left":
-						if selected[1][id] + $iconCursor.itemNum > 64:
-							$iconCursor.itemNum -= 64-selected[1][id]
-							selected[1][id] = 64
-						else:
-							selected[1][id] += $iconCursor.itemNum
-							holdingItem = false
-					else:
-						if selected[1][id] < 64:
-							selected[1][id] += 1
-							$iconCursor.itemNum -= 1
-						if $iconCursor.itemNum <= 0:
-							holdingItem = false
-				else:
-					if click == "left":
-						var replace = selected[0][id] > 0
-						var itemID = selected[0][id]
-						var itemNum = selected[1][id]
-						selected[1][id] = $iconCursor.itemNum
-						selected[0][id] = $iconCursor.itemID
-						holdingItem = false
-						if replace:
-							$iconCursor.itemNum = itemNum
-							$iconCursor.itemID = itemID
-							holdingItem = true
-					elif selected[0][id] == 0:
-						selected[0][id] = $iconCursor.itemID
-						selected[1][id] = 1
-						$iconCursor.itemNum -= 1
-						if $iconCursor.itemNum <= 0:
-							holdingItem = false
-		else:
-			if click == "left":
-				if ["icr","ctr"].has(type):
-					$iconCursor.itemID = selected[0]
-					$iconCursor.itemNum = selected[1]
-					holdingItem = true
-				elif type == "fr":
-					$iconCursor.itemID = selected[0][2]
-					$iconCursor.itemNum = selected[1][2]
-					selected[0][2] = 0
-					selected[1][2] = 0
-					holdingItem = true
-				elif selected[0][id] > 0:
-					$iconCursor.itemID = selected[0][id]
-					$iconCursor.itemNum = selected[1][id]
-					selected[1][id] = 0
-					selected[0][id] = 0
-					holdingItem = true
-			elif !["icr","ctr","fr"].has(type):
-				$iconCursor.itemID = selected[0][id]
-				$iconCursor.itemNum = ceil(selected[1][id]/2.0)
-				selected[1][id] = floor(selected[1][id]/2.0)
-				if selected[1][id] <= 0:
-					selected[0][id] = 0
-				holdingItem = true
-		if ["ft","fb","fr"].has(type):
-			emit_signal("updateFurnace")
-		check_crafting()
+		if holding:
+			get_node("../../entities").add_item(holdingData["id"],holdingData["amount"],get_node("../../Player").position,true)
+			holding = false
+		for i in range(inventoryCraft.size()):
+			if !inventoryCraft[i].empty():
+				get_node("../../entities").add_item(inventoryCraft[i]["id"],inventoryCraft[i]["amount"],get_node("../../Player").position,true)
+				inventoryCraft[i] = emptyItem.duplicate(true)
+		for i in range(craftingTable.size()):
+			if !craftingTable[i].empty():
+				get_node("../../entities").add_item(craftingTable[i]["id"],craftingTable[i]["amount"],get_node("../../Player").position,true)
+				craftingTable[i] = emptyItem.duplicate(true)
 
 func check_crafting():
-	var craft = get_node("../hotbar").inventoryCraft
+	var craft = inventoryCraft
 	var size = 2
 	if get_node("../craftingTable").visible:
-		craft = get_node("../hotbar").craftingTable
+		craft = craftingTable
 		size = 3
 	var loc = 0
 	var orgin = Vector2(-1,-1)
@@ -308,25 +217,24 @@ func check_crafting():
 	var craftingAll = []
 	for y in range(size):
 		for x in range(size):
-			if craft[0][loc] > 0 and orgin == Vector2(-1,-1):
+			if craft[loc]["id"] > 0 and orgin == Vector2(-1,-1):
 				orgin = Vector2(x,y)
-				crafting.append([Vector2(0,0),craft[0][loc]])
-				if PLANK_TYPES.has(craft[0][loc]):
+				crafting.append([Vector2(0,0),craft[loc]["id"]])
+				if PLANK_TYPES.has(craft[loc]["id"]):
 					craftingAll.append([Vector2(0,0),ALL_PLANKS])
 				else:
-					craftingAll.append([Vector2(0,0),craft[0][loc]])
-			elif craft[0][loc] > 0:
-				crafting.append([Vector2(x,y)-orgin,craft[0][loc]])
-				if PLANK_TYPES.has(craft[0][loc]):
+					craftingAll.append([Vector2(0,0),craft[loc]["id"]])
+			elif craft[loc]["id"] > 0:
+				crafting.append([Vector2(x,y)-orgin,craft[loc]["id"]])
+				if PLANK_TYPES.has(craft[loc]["id"]):
 					craftingAll.append([Vector2(x,y)-orgin,ALL_PLANKS])
 				else:
-					craftingAll.append([Vector2(x,y)-orgin,craft[0][loc]])
+					craftingAll.append([Vector2(x,y)-orgin,craft[loc]["id"]])
 			loc += 1
 	if crafting == []:
 		made = false
 		return
 	for i in range(recipes.size()):
-		print(craftingAll)
 		if recipes[i][0] == crafting or craftingAll == recipes[i][0]:
 			crafted = i
 			made = true

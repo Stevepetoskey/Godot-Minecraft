@@ -8,7 +8,7 @@ var entityType = {"player":"~","pig":"p","item":"~","zombie":"h","skeleton":"h",
 var saved = false
 
 onready var main = get_node("..")
-onready var inventory = get_node("../CanvasLayer/hotbar")
+onready var inventory = get_node("../CanvasLayer/Inventory")
 
 signal loaded
 
@@ -74,8 +74,7 @@ func add_item(id:int,num:int,pos,dropped):
 	if id > 0:
 		var item = load("res://assets/Item.tscn").instance()
 		item.motion.x = 64*int(dropped)
-		if dropped:
-			item.collectable = false
+		item.collectable = dropped
 		item.itemID = id
 		item.get_node("Sprite").texture = get_node("../CanvasLayer/hotbar").textures[id]
 		item.itemNum = num
@@ -128,8 +127,8 @@ func load_data():
 		add_child(entity)
 
 func get_damage():
-	if inventory.itemDamage.has(inventory.inventory[0][get_node("../CanvasLayer/hotbar/select").selected]):
-		return inventory.itemDamage[inventory.inventory[0][get_node("../CanvasLayer/hotbar/select").selected]]
+	if get_node("../CanvasLayer/hotbar").itemDamage.has(inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"]):
+		return get_node("../CanvasLayer/hotbar").itemDamage[inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"]]
 	else:
 		return 1
 

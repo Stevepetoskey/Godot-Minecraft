@@ -1,9 +1,5 @@
 extends Sprite
 
-var inventory = [[],[],[]] #Item id, amount, data
-var inventoryCraft = [[0,0,0,0],[0,0,0,0]]
-var craftingTable = [[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]]
-
 var toolMultiplier = {"all":1,"wood":2,"stone":4,"iron":6,"diamond":8,"netherite":9,"gold":12}
 var itemData = {11:[2,"wood"],12:[3,"wood"],14:[1,"wood"],16:[5,"wood"],17:[4,"wood"],18:[2,"stone"],19:[3,"stone"],20:[1,"stone"],21:[5,"stone"],22:[4,"stone"],29:[2,"iron"],30:[3,"iron"],31:[1,"iron"],32:[5,"iron"],33:[4,"iron"],36:[2,"diamond"],37:[3,"diamond"],38:[1,"diamond"],39:[5,"diamond"],40:[4,"diamond"],
 85:[2,"gold"],86:[3,"gold"],87:[1,"gold"],88:[5,"gold"],89:[4,"gold"]} #1 shovel 2 pick 3 axe 4 hoe 5 sword
@@ -19,60 +15,68 @@ var textures = {1:load("res://textures/Blocks/grass_block.png"),2:load("res://te
 57:preload("res://textures/Blocks/oak_sapling.png"),58:preload("res://textures/Blocks/chest/normal_closed.png"),59:preload("res://textures/items/bucket.png"),60:preload("res://textures/items/water_bucket.png"),61:preload("res://textures/items/arrow.png"),62:preload("res://textures/items/oak_door.png"),63:preload("res://textures/items/oak_door.png"),64:preload("res://textures/Blocks/birch_log.png"),65:preload("res://textures/Blocks/birch_planks.png"),66:preload("res://textures/Blocks/birch_leaves.png"),67:preload("res://textures/Blocks/birch_sapling.png"),
 68:preload("res://textures/Blocks/spruce_log.png"),69:preload("res://textures/Blocks/spruce_planks.png"),70:preload("res://textures/Blocks/spruce_leaves.png"),71:preload("res://textures/Blocks/spruce_sapling.png"),72:preload("res://textures/Blocks/gold_ore.png"),73:preload("res://textures/Blocks/gold_block.png"),74:preload("res://textures/items/charcoal.png"),75:preload("res://textures/items/gold_ingot.png"),76:preload("res://textures/items/gold_nugget.png"),77:preload("res://textures/Blocks/lapis_ore.png"),78:preload("res://textures/items/lapis_lazuli.png"),
 79:preload("res://textures/Blocks/lapis_block.png"),80:preload("res://textures/Blocks/redstone_torch.png"),81:preload("res://textures/items/apple.png"),82:preload("res://textures/Blocks/redstone_ore.png"),83:preload("res://textures/items/redstone.png"),84:preload("res://textures/Blocks/redstone_block.png"),85:preload("res://textures/items/golden_pickaxe.png"),86:preload("res://textures/items/golden_axe.png"),87:preload("res://textures/items/golden_shovel.png"),88:preload("res://textures/items/golden_sword.png"),89:preload("res://textures/items/golden_hoe.png"),
-90:preload("res://textures/items/rotten_flesh.png"),91:preload("res://textures/items/wheat_seeds.png"),92:preload("res://textures/items/wheat.png"),93:preload("res://textures/items/bread.png"),94:preload("res://textures/Blocks/grass.png"),95:preload("res://textures/Blocks/farmland.png"),96:preload("res://textures/Blocks/farmland_moist.png")}
+90:preload("res://textures/items/rotten_flesh.png"),91:preload("res://textures/items/wheat_seeds.png"),92:preload("res://textures/items/wheat.png"),93:preload("res://textures/items/bread.png"),94:preload("res://textures/Blocks/grass.png"),95:preload("res://textures/Blocks/farmland.png"),96:preload("res://textures/Blocks/farmland_moist.png"),97:preload("res://textures/Blocks/stairs/stone_brick_stairs0.png"),98:preload("res://textures/Blocks/stairs/cobblestone_stairs0.png")}
 var items = [9,11,12,14,15,16,17,18,19,20,21,22,24,29,30,31,32,33,34,36,37,38,39,40,46,47,49,55,56,59,61,75,78,81,85,86,87,88,89,90,91,92,93]
+var stairs = [97,98]
+
+onready var inventory = get_node("../Inventory")
 
 func _ready():
 	for i in range(9):
-		var icon = load("res://assets/inventoryIcon.tscn").instance()
-		icon.rect_position = Vector2(i*20-87,-7)
-		icon.id = i
-		icon.main = get_node("../Inventory")
+		var icon = load("res://assets/hotbarIcon.tscn").instance()
+		icon.loc = i
+		icon.rect_position = Vector2(i*20-88,-7)
 		add_child(icon)
 
-func add_to_inventory(id,num):
+func add_to_inventory(id,num) -> void:
 	var last = 0
-	while inventory[0].find(id,last) != -1 and num > 0:
-		var loc = inventory[0].find(id,last)
-		if inventory[1][loc] + num > 64:
-			num -= 64-inventory[1][loc]
-			inventory[1][loc] = 64
+	while find_id(inventory.inventory,id,last) != -1 and num > 0:
+		var loc = find_id(inventory.inventory,id,last)
+		if inventory.inventory[loc]["amount"] + num > 64:
+			num -= 64-inventory.inventory[loc]["amount"]
+			inventory.inventory[loc]["amount"] = 64
 			last = loc+1
 		else:
-			inventory[1][loc] += num
+			inventory.inventory[loc]["amount"] += num
 			return
 	last = 0
-	while inventory[0].find(0,last) != -1 and num > 0:
-		var loc = inventory[0].find(0,last)
-		inventory[0][loc] = id
+	while find_id(inventory.inventory,0,last) != -1 and num > 0:
+		var loc = find_id(inventory.inventory,0,last)
+		inventory.inventory[loc]["id"] = id
 		if num > 64:
-			inventory[1][loc] = 64
+			inventory.inventory[loc]["amount"] = 64
 			num -= 64
 		else:
-			inventory[1][loc] = num
+			inventory.inventory[loc]["amount"] = num
 			return
 		last = loc+1
 
+func find_id(array,id,from = 0) -> int:
+	for itemId in range(from,array.size()):
+		if array[itemId]["id"] == id:
+			return itemId
+	return -1
+
 func remove_from_inventory(loc,num):
-	if num >= inventory[1][loc]:
-		inventory[0][loc] = 0
-		inventory[1][loc] = 0
+	if num >= inventory.inventory[loc]["amount"]:
+		inventory.inventory[loc]["id"] = 0
+		inventory.inventory[loc]["amount"] = 0
 	else:
-		inventory[1][loc] -= num
+		inventory.inventory[loc]["amount"] -= num
 
 func can_harvest(block):
 	var blockStats = get_node("../..").block_data[block]
 	var itemStats = [0,"all"]
-	if itemData.has(inventory[0][get_node("select").selected]):
-		itemStats = itemData[inventory[0][get_node("select").selected]]
+	if itemData.has(inventory.inventory[get_node("select").selected]["id"]):
+		itemStats = itemData[inventory.inventory[get_node("select").selected]["id"]]
 	if (blockStats.minedBy == itemStats[0] and (blockStats.canHarvest.has(itemStats[1]) or blockStats.canHarvest.has("allType"))) or blockStats.canHarvest.has("all"):
 		return true
 
 func check_time_to_break(block):
 	var blockStats = get_node("../..").block_data[block]
 	var itemStats = [0,"all"]
-	if itemData.has(inventory[0][get_node("select").selected]):
-		itemStats = itemData[inventory[0][get_node("select").selected]]
+	if itemData.has(inventory.inventory[get_node("select").selected]["id"]):
+		itemStats = itemData[inventory.inventory[get_node("select").selected]["id"]]
 	var multiplier = 1
 	if blockStats.minedBy == itemStats[0]:
 		multiplier = toolMultiplier[itemStats[1]]

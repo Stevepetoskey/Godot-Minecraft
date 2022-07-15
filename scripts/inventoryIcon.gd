@@ -1,119 +1,143 @@
 extends TextureButton
 
-var id = 0
-var clickable = false
-var inventoryLoc = ".."
-var type = "i"
-var made = false
-var mouseIn = false
+var loc = 0
+var type = "inventory"
+var mouseIn
 
 onready var main
-onready var inventory = get_node("../../Inventory")
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	var current
-	if ["ft","fb","fr"].has(type):
-		current = main.currentFurnace
-	elif ["sc"].has(type):
-		current = main.currentChest
-	match type:
-		"icr":
-			if main.made and !get_node("../../../craftingTable").visible:
-				visible = true
-				clickable = true
-				texture_normal = get_node(inventoryLoc).textures[main.recipes[main.crafted][1][0]]
-				$Label.text = str(main.recipes[main.crafted][1][1])
-			else:
-				texture_normal = null
-				clickable = false
-				$Label.text = ""
-		"ctr":
-			if inventory.made and main.visible:
-				visible = true
-				clickable = true
-				texture_normal = get_node(inventoryLoc).textures[inventory.recipes[inventory.crafted][1][0]]
-				$Label.text = str(inventory.recipes[inventory.crafted][1][1])
-				rect_scale = Vector2(1.2,1.2)
-			else:
-				clickable = false
-				texture_normal = null
-				$Label.text = ""
-		"ft":
-			if main.visible and current[0][0] > 0:
-				visible = true
-				texture_normal = get_node(inventoryLoc).textures[current[0][0]]
-				$Label.text = str(current[1][0])
-			else:
-				texture_normal = null
-				$Label.text = ""
-		"fb":
-			if main.visible and current[0][1] > 0:
-				visible = true
-				texture_normal = get_node(inventoryLoc).textures[current[0][1]]
-				$Label.text = str(current[1][1])
-			else:
-				texture_normal = null
-				$Label.text = ""
-		"fr":
-			if main.visible and current[0][2] > 0:
-				visible = true
-				texture_normal = get_node(inventoryLoc).textures[current[0][2]]
-				$Label.text = str(current[1][2])
-				clickable = true
-			else:
-				clickable = false
-				texture_normal = null
-				$Label.text = ""
-		"sc":
-			if main.visible and current[0][id] > 0:
-				visible = true
-				texture_normal = get_node(inventoryLoc).textures[current[0][id]]
-				$Label.text = str(current[1][id])
-			else:
-				texture_normal = null
-				$Label.text = ""
-		_:
-			var place = get_node(inventoryLoc).inventory
-			match type:
-				"ic":
-					place = get_node(inventoryLoc).inventoryCraft
-				"ct":
-					place = get_node(inventoryLoc).craftingTable
-			if place[0][id] == 0:
-				texture_normal = null
-				$Label.text = ""
-			else:
-				visible = true
-				texture_normal = get_node(inventoryLoc).textures[place[0][id]]
-				$Label.text = str(place[1][id])
-	print(type)
-	if main.visible and clickable and mouseIn:
-		if Input.is_action_pressed("jump"):
-			main.icon_clicked(id,type,"right",true)
-		elif Input.is_action_just_pressed("build"):
-			main.icon_clicked(id,type,"right")
 
 func _ready():
+	var slot = main.inventory
+	match type:
+		"inventoryCraft":
+			slot = main.inventoryCraft
+		"craftingTable":
+			slot = main.craftingTable
+		"furnace":
+			slot = main.currentFurnace
+		"chest":
+			slot = main.currentChest
 	visible = true
 
+func _process(delta):
+	if main.visible:
+		var slot = main.inventory
+		match type:
+			"inventoryCraft":
+				slot = main.inventoryCraft
+			"craftingTable":
+				slot = main.craftingTable
+			"furnace","furnaceResult":
+				slot = main.currentFurnace
+			"chest":
+				slot = main.currentChest
+		match type:
+			"inventory","inventoryCraft","craftingTable":
+				if slot[loc]["id"] != 0:
+					texture_normal = main.get_node("../hotbar").textures[slot[loc]["id"]]
+					$Label.show()
+					$Label.text = str(slot[loc]["amount"])
+				else:
+					texture_normal = null
+					$Label.hide()
+			"inventoryCraftResult","craftingTableResult":
+				if main.made:
+					texture_normal = main.get_node("../hotbar").textures[main.recipes[main.crafted][1][0]]
+					$Label.text = str(main.recipes[main.crafted][1][1])
+					$Label.show()
+				else:
+					texture_normal = null
+					$Label.hide()
+			"furnace","furnaceResult":
+				if main.get_node("../furnace").visible and slot[loc]["id"] != 0:
+					texture_normal = main.get_node("../hotbar").textures[slot[loc]["id"]]
+					$Label.text = str(slot[loc]["amount"])
+					$Label.show()
+				else:
+					texture_normal = null
+					$Label.hide()
+			"chest":
+				if main.get_node("../chestSmall").visible and slot[loc]["id"] != 0:
+					texture_normal = main.get_node("../hotbar").textures[slot[loc]["id"]]
+					$Label.text = str(slot[loc]["amount"])
+					$Label.show()
+				else:
+					texture_normal = null
+					$Label.hide()
+		if Input.is_action_just_pressed("build") and mouseIn and !["inventoryCraftResult","craftingTableResult"].has(type):
+			if main.holding:
+				if type != "furnaceResult" and (slot[loc]["id"] == main.holdingData["id"] or slot[loc]["id"] == 0) and slot[loc]["amount"] < 64:
+					slot[loc]["id"] = main.holdingData["id"]
+					slot[loc]["amount"] += 1
+					main.holdingData["amount"] -= 1
+					if main.holdingData["amount"] <= 0:
+						main.holding = false
+			elif slot[loc]["id"] != 0:
+				var amount = round(slot[loc]["amount"]/2.0)
+				slot[loc]["amount"] -= amount
+				main.holdingData = {"id":slot[loc]["id"],"amount":amount,"data":slot[loc]["data"]}
+				main.holding = true
+				if slot[loc]["amount"] <= 0:
+					slot[loc]["id"] = 0
+			if ["craftingTable","inventoryCraft"].has(type):
+				main.check_crafting()
+			elif ["furnaceResult","furnace"].has(type):
+				main.emit_signal("updateFurnace")
+
 func _on_inventoryIcon_pressed():
-	if clickable:
-		if type == "icr":
+	var slot = main.inventory
+	match type:
+		"inventoryCraft":
+			slot = main.inventoryCraft
+		"craftingTable":
+			slot = main.craftingTable
+		"furnace","furnaceResult":
+			slot = main.currentFurnace
+		"chest":
+			slot = main.currentChest
+	if !["inventoryCraftResult","craftingTableResult"].has(type):
+		if main.holding and type != "furnaceResult":
+			if slot[loc]["id"] != main.holdingData["id"]:
+				var replace = slot[loc]
+				slot[loc] = main.holdingData
+				if replace["id"] != 0:
+					main.holdingData = replace
+				else:
+					main.holding = false
+			else:
+				if slot[loc]["amount"] + main.holdingData["amount"] <= 64:
+					slot[loc]["amount"] += main.holdingData["amount"]
+					main.holding = false
+				else:
+					main.holdingData["amount"] -= 64-slot[loc]["amount"]
+					slot[loc]["amount"] = 64
+		elif !main.holding and slot[loc]["id"] != 0:
+			main.holdingData = slot[loc]
+			main.holding = true
+			slot[loc] = {"id":0,"amount":0,"data":{}}
+		if ["craftingTable","inventoryCraft"].has(type):
+			main.check_crafting()
+		elif ["furnaceResult","furnace"].has(type):
+			main.emit_signal("updateFurnace")
+	elif main.made and (!main.holding or main.holdingData["id"] == main.recipes[main.crafted][1][0]):
+		if type == "inventoryCraftResult":
 			for i in range(4):
-				if get_node(inventoryLoc).inventoryCraft[0][i] > 0:
-					get_node(inventoryLoc).inventoryCraft[1][i] -= 1
-					if get_node(inventoryLoc).inventoryCraft[1][i] <= 0:
-						get_node(inventoryLoc).inventoryCraft[0][i] = 0 
-		elif type == "ctr":
+				if main.inventoryCraft[i]["id"] > 0:
+					main.inventoryCraft[i]["amount"] -= 1
+					if main.inventoryCraft[i]["amount"] <= 0:
+						main.inventoryCraft[i] = {"id":0,"amount":0,"data":{}}
+		else:
 			for i in range(9):
-				if get_node(inventoryLoc).craftingTable[0][i] > 0:
-					get_node(inventoryLoc).craftingTable[1][i] -= 1
-					if get_node(inventoryLoc).craftingTable[1][i] <= 0:
-						get_node(inventoryLoc).craftingTable[0][i] = 0 
-#		if ["ft","fb","fr"].has(type):
-#			get_node(mainLoc).icon_clicked(id,type,"left",)
-		main.icon_clicked(id,type,"left")
+				if main.craftingTable[i]["id"] > 0:
+					main.craftingTable[i]["amount"] -= 1
+					if main.craftingTable[i]["amount"] <= 0:
+						main.craftingTable[i] = {"id":0,"amount":0,"data":{}}
+		if !main.holding:
+			main.holdingData = {"id":main.recipes[main.crafted][1][0],"amount":main.recipes[main.crafted][1][1],"data":{}}
+			main.holding = true
+		else:
+			main.holdingData["amount"] += main.recipes[main.crafted][1][1]
+		main.check_crafting()
 
 func _on_inventoryIcon_mouse_entered():
 	mouseIn = true

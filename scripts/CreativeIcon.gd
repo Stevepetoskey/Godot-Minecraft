@@ -1,12 +1,19 @@
 extends TextureButton
 
-var itemId = 0
+var id = 0
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
+onready var inventory = get_node("../../../Inventory")
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _pressed():
+	if inventory.holding and inventory.holdingData["id"] != id:
+		inventory.holding = false
+	else:
+		if Input.is_action_pressed("actionClick"):
+			inventory.holdingData = {"id":id,"amount":64,"data":{}}
+			inventory.holding = true
+		else:
+			if !inventory.holding:
+				inventory.holdingData = {"id":id,"amount":1,"data":{}}
+				inventory.holding = true
+			else:
+				inventory.holdingData["amount"] += 1

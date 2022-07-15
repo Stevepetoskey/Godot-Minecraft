@@ -297,6 +297,7 @@ shape = SubResource( 10 )
 max_distance = 500.0
 
 [node name="walk" type="AudioStreamPlayer2D" parent="."]
+volume_db = -10.0
 
 [node name="walkEnd" type="Timer" parent="."]
 wait_time = 0.5
