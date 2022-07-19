@@ -7,7 +7,7 @@ var prePlayerPos = Vector2(0,0) #The position the player was at before the threa
 
 var lightArray = []
 var transparent = [0,5,41,43,54,58,60,62,63,66,70,94]
-var solidTrans = [53,80,97,98]
+var solidTrans = [53,80,97,98,99,100,101,102,103]
 var ambientLevel = 15
 var calls = []
 var callAmount = 0
@@ -27,7 +27,8 @@ func get_light_level(pos):
 	return lightArray[lightPosition.x][lightPosition.y]
 
 func get_layer(pos,includeTransparent = false):
-	if (!includeTransparent and transparent.has(get_node("..").block("get",pos,1))) or (includeTransparent and get_node("..").block("get",pos,1) == 0):
+	var block = get_node("..").block("get",pos,1)
+	if (!includeTransparent and transparent.has(block)) or (includeTransparent and block == 0):
 		return 0
 	return 1
 
@@ -39,7 +40,8 @@ func get_drop_off(lightPos,firstPos,value):
 	return 3
 
 func can_propigate(pos1,pos2):
-	if get_layer(pos1) == get_layer(pos2) or get_layer(pos1) == 0 or (main.block("get",pos1,get_layer(pos1)) != null and main.block_data[main.block("get",pos1,get_layer(pos1))].lightSource):
+	var block = main.block("get",pos1,get_layer(pos1))
+	if get_layer(pos1) == get_layer(pos2) or get_layer(pos1) == 0 or (block != null and main.block_data[block].lightSource):
 		return true
 
 #Initializes the light array based off of the dimensions stated in LightRect

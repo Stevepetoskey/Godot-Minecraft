@@ -153,6 +153,14 @@ func _physics_process(_delta):
 					elif motion.x > 0 and stairRight.empty() and !stairRightBottom.empty():
 						position.y -= 9
 						onStairs = true
+			elif flyMode:
+				inAir = false
+				if Input.is_action_pressed("jump"):
+					motion.y = -JUMPSPEED
+				elif Input.is_action_pressed("sneak"):
+					motion.y = JUMPSPEED
+				else:
+					motion.y = 0
 			elif inWater != []:
 				inAir = false
 				if Input.is_action_pressed("jump"):
@@ -167,14 +175,6 @@ func _physics_process(_delta):
 					motion.y = 0
 				else:
 					motion.y = JUMPSPEED/2
-			elif flyMode:
-				inAir = false
-				if Input.is_action_pressed("jump"):
-					motion.y = -JUMPSPEED
-				elif Input.is_action_pressed("sneak"):
-					motion.y = JUMPSPEED
-				else:
-					motion.y = 0
 			if is_on_wall():
 				if !onStairs:
 					motion.x = 0

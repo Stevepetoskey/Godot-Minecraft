@@ -66,11 +66,21 @@ func render():
 		94:
 			$CollisionShape2D.disabled = true
 			$Sprite.material.set_shader_param("color",Color(0.25,0.56,0.11,1.0))
-		97,98:
+		97,98,99,100,101,102,103:
 			var file = "stone_brick_stairs"
 			match id:
 				98:
 					file = "cobblestone_stairs"
+				99:
+					file = "oak_stairs"
+				100:
+					file = "birch_stairs"
+				101:
+					file = "spruce_stairs"
+				102:
+					file = "sandstone_stairs"
+				103:
+					file = "brick_stairs"
 			$Sprite.texture = load("res://textures/Blocks/stairs/" + str(file) + str(data[0])+ ".png")
 			if z != 0:
 				$CollisionShape2D.disabled = true
@@ -181,11 +191,11 @@ func _on_Sapling_timeout():
 				main.block(logType,Vector2(pos.x,pos.y-h),z)
 			treeH = pos.y-treeH
 			for tX in range(5):
-				for tY in range(main.trees[treeType][tX].size(),-1,-1):
+				for tY in range(main.trees[treeType][tX].size()-1,-1,-1):
 					if main.trees[treeType][tX][tY] > 1 and main.block("get",Vector2(pos.x+(tX-2),tY+treeH),z) == 0:
 						main.block(str(main.trees[treeType][tX][tY]),Vector2(pos.x+(tX-2),tY+treeH),z)
 					if z != 1 and main.trees[treeType][tX][tY] > 1 and main.block("get",Vector2(pos.x+(tX-2),tY+treeH),1) == 0:
-						main.block(main.trees[treeType][tX][tY],Vector2(pos.x+(tX-2),tY+treeH),1)
+						main.block(str(main.trees[treeType][tX][tY]),Vector2(pos.x+(tX-2),tY+treeH),1)
 			$Sapling.stop()
 			for i in range(-1,2):
 				main.load_chunk(main.get_chunk(pos.x)+i)

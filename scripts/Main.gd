@@ -7,7 +7,7 @@ const BLOCK = preload("res://assets/block.tscn")
 const BLOCKSHADER = preload("res://shaders/block.tres")
 const WATERSHADER = preload("res://shaders/Water.tres")
 const WATER = preload("res://assets/Water.tscn")
-const INTERACTABLE_BLOCK = [23,57,62,63,67,97,98]
+const INTERACTABLE_BLOCK = [23,57,62,63,67,97,98,99,100,101,102,103]
 const BIOME_TYPES = {
 	"Plains":{"id":0,"layers":[[1,[1,1]],[2,[2,3]]],"trees":["normal","birch"]},
 	"Forest":{"id":1,"layers":[[1,[1,1]],[2,[2,3]]],"trees":["normal","birch"]},
@@ -528,7 +528,7 @@ func build_event(action,pos,id,z = 1,itemAction = true, blockData = {}):
 				interactableBlockData[[pos,z]] = [blockData["level"]]
 			41:
 				interactableBlockData[[pos,z]] = [8]
-			97,98:
+			97,98,99,100,101,102,103:
 				var rot
 				if get_global_mouse_position().x > player.global_position.x:
 					if get_global_mouse_position().y < $cursor.position.y:

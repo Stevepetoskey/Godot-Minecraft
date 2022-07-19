@@ -50,6 +50,8 @@ L: 2
 - Set biomes
 - Added Sound effects (breaking,placing,walking ect...)
 - Added more music
+- Added gamemodes
+- Added flat worlds
 
 ## Alpha 4 pre 2
 - Fixed light some times not rendering after loading world
@@ -79,3 +81,4 @@ L: 2
 - Fixed items immediately collecting once dropped
 - When your health drops to zero, you die
 - Added stonebrick and cobblestone stairs
+- Added Oak, birch, spruce, sandstone, and brick stairs
