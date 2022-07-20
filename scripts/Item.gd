@@ -8,6 +8,11 @@ var motion = Vector2(0,0)
 var itemID = 0
 var itemNum = 0
 var collectable = true
+var wait = null
+
+func _ready():
+	if !collectable:
+		$Timer.start()
 
 func _physics_process(delta):
 	if is_on_floor():
@@ -30,9 +35,26 @@ func _on_Area2D_body_entered(body):
 					itemNum = 0
 					queue_free()
 		elif body.name == "Player":
-			for i in range(25):
-				position = lerp(position,body.position,i/75.0)
-				yield(get_tree().create_timer(0.01), "timeout")
-			get_node("../../CanvasLayer/hotbar").add_to_inventory(itemID,itemNum)
-			itemNum = 0
-			queue_free()
+			if collectable:
+				for i in range(25):
+					position = lerp(position,body.position,i/75.0)
+					yield(get_tree().create_timer(0.01), "timeout")
+				get_node("../../CanvasLayer/hotbar").add_to_inventory(itemID,itemNum)
+				itemNum = 0
+				queue_free()
+			else:
+				wait = body
+
+func _on_Timer_timeout():
+	collectable = true
+	if wait != null:
+		for i in range(25):
+			position = lerp(position,wait.position,i/75.0)
+			yield(get_tree().create_timer(0.01), "timeout")
+		get_node("../../CanvasLayer/hotbar").add_to_inventory(itemID,itemNum)
+		itemNum = 0
+		queue_free()
+
+func _on_Area2D_body_exited(body):
+	if body.name == "Player":
+		wait = null

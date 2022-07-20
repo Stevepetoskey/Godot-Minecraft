@@ -1,13 +1,14 @@
 extends Node
 
-const CURRENTVER = "0.3.0"
-const STABLE = true
+const CURRENTVER = "0.4.0 pre 6"
+const STABLE = false
 
 var savegame = File.new() #file
 var save_path = "user://saves/" #place of the file
+var tutorialPath = "res://data/Tutorial"
 var save_data
-#0 is survival 1 is creative
-var gamemode = 0
+
+var gamemode = "Survival"
 var worldSeed = 0
 var worldType = "Default"
 var worldNamePath = "newWorld"
@@ -41,20 +42,42 @@ func new_world(worldName):
 		dir.open("user://")
 		dir.make_dir("saves")
 #	var img = Image.new()
-	worldName.replace("/","")
-	worldName.replace(".","")
-	while Directory.new().dir_exists(save_path + worldName):
-		worldName = worldName + "_"
 	worldNamePath = worldName
+	worldNamePath.replace("/","")
+	worldNamePath.replace(".","")
+	while Directory.new().dir_exists(save_path + worldNamePath):
+		worldNamePath = worldNamePath + "_"
 	dir.open(save_path)
-	dir.make_dir(worldName)
+	dir.make_dir(worldNamePath)
 #	img.create(99,60,false,Image.FORMAT_RGBA8)
 #	img.save_png(save_path + islandName + "/Island.png")
-	savegame.open(save_path + worldName + "/" + worldName, File.WRITE)
+	savegame.open(save_path + worldNamePath + "/" + worldNamePath, File.WRITE)
 	savegame.store_var(new_data)
 	new = true
 	savegame.close()
-	
+
+func new_tutorial():
+	var dir = Directory.new()
+	if !Directory.new().dir_exists(save_path):
+		dir.open("user://")
+		dir.make_dir("saves")
+#	var img = Image.new()
+	worldNamePath = "Tutorial"
+	worldNamePath.replace("/","")
+	worldNamePath.replace(".","")
+	while Directory.new().dir_exists(save_path + worldNamePath):
+		worldNamePath = worldNamePath + "_"
+	dir.open(save_path)
+	dir.make_dir(worldNamePath)
+	var tutorialWorld = File.new()
+	tutorialWorld.open(tutorialPath,File.READ)
+	save_data = tutorialWorld.get_var()
+	tutorialWorld.close()
+	savegame.open(save_path + worldNamePath + "/" + worldNamePath, File.WRITE)
+	savegame.store_var(save_data)
+	new = false
+	savegame.close()
+
 #func _ready():
 #	new_data = get_from_json("Json Data/NewWorld.json")
 #	unfloat_2d(new_data["islandBack"])

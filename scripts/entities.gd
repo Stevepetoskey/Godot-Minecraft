@@ -8,7 +8,7 @@ var entityType = {"player":"~","pig":"p","item":"~","zombie":"h","skeleton":"h",
 var saved = false
 
 onready var main = get_node("..")
-onready var inventory = get_node("../CanvasLayer/hotbar")
+onready var inventory = get_node("../CanvasLayer/Inventory")
 
 signal loaded
 
@@ -44,22 +44,36 @@ func fill_entities():
 #						zombie.position = pos*Vector2(16,16)
 #						add_child(zombie)
 #						hCount += 3
+#					if randi()%10 == 1 and get_node("../Lighting").get_light_level(Vector2(x,y)) <= 7 and main.block("get",pos) == 0 and main.block("get",pos-Vector2(0,1)) == 0 and !get_node("../Lighting").transparent.has(main.block("get",pos + Vector2(0,1))):
+#						var skeleton = entityAssets["skeleton"].instance()
+#						skeleton.position = pos*Vector2(16,16)
+#						add_child(skeleton)
+#						hCount += 5
 
 func spawn_in_chunk(chunkX):
 	if !main.chunks[chunkX][2]:
+		var pCount = 0
+		var hCount = 0
+		for entity in get_children():
+			if main.get_chunk(round(entity.position.x/16)) < get_node("../Player").playerChunk+5 and main.get_chunk(round(entity.position.x/16)) >= get_node("../Player").playerChunk-5:
+				match entityType[entity.TYPE]:
+					"p":
+						pCount+=1
+					"n","h":
+						hCount += 1
 		for x in range(0,main.chunkSize.x):
 			for y in range(0,main.chunkSize.y):
 				var pos = Vector2(x+(chunkX*main.chunkSize.x),y)
 				var amLvl = get_node("../Lighting").ambientLevel
-				if randi()%10 == 1 and amLvl >= 9 and main.block("get",pos) == 0 and main.block("get",pos,0) == 0 and main.block("get",pos + Vector2(0,1)) ==1:
+				if pCount < 10 and randi()%20 == 1 and amLvl >= 9 and main.block("get",pos) == 0 and main.block("get",pos,0) == 0 and main.block("get",pos + Vector2(0,1)) ==1:
 					var pig = entityAssets["pig"].instance()
 					pig.position = pos*Vector2(16,16)
 					add_child(pig)
-				if randi()%10 == 1 and amLvl <= 7 and main.block("get",pos) == 0 and main.block("get",pos-Vector2(0,1)) == 0 and !get_node("../Lighting").transparent.has(main.block("get",pos + Vector2(0,1))):
+				if hCount < 20 and randi()%10 == 1 and amLvl <= 7 and main.block("get",pos) == 0 and main.block("get",pos-Vector2(0,1)) == 0 and !get_node("../Lighting").transparent.has(main.block("get",pos + Vector2(0,1))):
 					var zombie = entityAssets["zombie"].instance()
 					zombie.position = pos*Vector2(16,16)
 					add_child(zombie)
-				if randi()%10 == 1 and amLvl <= 7 and main.block("get",pos) == 0 and main.block("get",pos-Vector2(0,1)) == 0 and !get_node("../Lighting").transparent.has(main.block("get",pos + Vector2(0,1))):
+				if hCount < 20 and randi()%10 == 1 and amLvl <= 7 and main.block("get",pos) == 0 and main.block("get",pos-Vector2(0,1)) == 0 and !get_node("../Lighting").transparent.has(main.block("get",pos + Vector2(0,1))):
 					var skeleton = entityAssets["skeleton"].instance()
 					skeleton.position = pos*Vector2(16,16)
 					add_child(skeleton)
@@ -74,8 +88,7 @@ func add_item(id:int,num:int,pos,dropped):
 	if id > 0:
 		var item = load("res://assets/Item.tscn").instance()
 		item.motion.x = 64*int(dropped)
-		if dropped:
-			item.collectable = false
+		item.collectable = !dropped
 		item.itemID = id
 		item.get_node("Sprite").texture = get_node("../CanvasLayer/hotbar").textures[id]
 		item.itemNum = num
@@ -128,8 +141,8 @@ func load_data():
 		add_child(entity)
 
 func get_damage():
-	if inventory.itemDamage.has(inventory.inventory[0][get_node("../CanvasLayer/hotbar/select").selected]):
-		return inventory.itemDamage[inventory.inventory[0][get_node("../CanvasLayer/hotbar/select").selected]]
+	if get_node("../CanvasLayer/hotbar").itemDamage.has(inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"]):
+		return get_node("../CanvasLayer/hotbar").itemDamage[inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"]]
 	else:
 		return 1
 

@@ -58,7 +58,7 @@ func _physics_process(delta):
 			get_node("../../Player").exhaustion += 0.1
 			take_damage(get_node("..").get_damage(),true,sign(position.x - get_node("../../Player").position.x))
 		if health <= 0:
-#			get_node("..").add_item(randi()%54+1,randi()%3+1,position,false)
+			get_node("..").add_item(90,randi()%3,position,false)
 			queue_free()
 		#gravity
 		if !is_on_floor():

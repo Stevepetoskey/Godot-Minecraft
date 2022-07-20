@@ -6,13 +6,15 @@ var lightThread = Thread.new() #The lighting thread. This is the seperate thread
 var prePlayerPos = Vector2(0,0) #The position the player was at before the thread started
 
 var lightArray = []
-var transparent = [0,5,41,43,54,58,60,62,63]
+var transparent = [0,5,41,43,54,58,60,62,63,66,70,94]
+var solidTrans = [53,80,97,98,99,100,101,102,103]
 var ambientLevel = 15
 var calls = []
 var callAmount = 0
 var updated = []
 var worldLoaded = false
 var playerLoaded = false
+var lostLevel = 85
 
 var day = true
 onready var main = get_node("..")
@@ -25,7 +27,8 @@ func get_light_level(pos):
 	return lightArray[lightPosition.x][lightPosition.y]
 
 func get_layer(pos,includeTransparent = false):
-	if (!includeTransparent and transparent.has(get_node("..").block("get",pos,1))) or (includeTransparent and get_node("..").block("get",pos,1) == 0):
+	var block = get_node("..").block("get",pos,1)
+	if (!includeTransparent and transparent.has(block)) or (includeTransparent and block == 0):
 		return 0
 	return 1
 
@@ -37,7 +40,8 @@ func get_drop_off(lightPos,firstPos,value):
 	return 3
 
 func can_propigate(pos1,pos2):
-	if get_layer(pos1) == get_layer(pos2) or get_layer(pos1) == 0 or (main.block("get",pos1,get_layer(pos1)) != null and main.block_data[main.block("get",pos1,get_layer(pos1))].lightSource):
+	var block = main.block("get",pos1,get_layer(pos1))
+	if get_layer(pos1) == get_layer(pos2) or get_layer(pos1) == 0 or (block != null and main.block_data[block].lightSource):
 		return true
 
 #Initializes the light array based off of the dimensions stated in LightRect
@@ -50,10 +54,12 @@ func _ready():
 func _process(delta):
 	render()
 	var cursorPos = vec2_round(get_node("../cursor").position / Vector2(16,16)) - vec2_round(get_node("../Player").position/ Vector2(16,16)) + Vector2(LightRect.x/2,LightRect.y/2)
-	get_node("../CanvasLayer/Label").text = "Light Level: " + str(lightArray[cursorPos.x][cursorPos.y])
+	if cursorPos.y < 128 and cursorPos.y >= 0:
+		get_node("../CanvasLayer/Label").text = "Light Level: " + str(lightArray[cursorPos.x][cursorPos.y])
 
 #Starts the calculations of the light around the player
 func render():
+#	print(!lightThread.is_active(),worldLoaded,playerLoaded)
 	if !lightThread.is_active() and worldLoaded and playerLoaded:
 		prePlayerPos = get_node("../Player").position
 		lightThread.start(self,"prep_light",lightArray.duplicate(true),1)
@@ -69,7 +75,7 @@ func prep_light(data): #threadLight is what will replace the main lightArray whe
 				var backBlock = main.block("get",pos,0)
 				if transparent.has(block):
 					if transparent.has(backBlock):
-						if pos.y < 90: #normal 90; level at which ambient light is lost
+						if pos.y < lostLevel: #normal 90; level at which ambient light is lost
 							threadLight[x][y] = ambientLevel
 						else:
 							threadLight[x][y] = 0
@@ -115,7 +121,7 @@ func thread_done(threadLight):
 					get_node("../chunks").get_node(str(main.get_chunk(pos.x))).get_node(str(get_layer(pos,true))+","+str(main.chunkify(pos).x)+","+str(pos.y)+"/Sprite").material.set_shader_param("shade",lightArray[x][y]/15.0)
 #					if main.block("get",pos) == 54:
 #						print(get_layer(pos) > 0, " , ", (transparent.has(main.block("get",pos)) or main.block("get",pos) == 53) , " , ", !transparent.has(main.block("get",pos,0)))
-					if get_node("../chunks").get_node(str(main.get_chunk(pos.x))).has_node("0,"+str(main.chunkify(pos).x)+","+str(pos.y)) and get_layer(pos,true) > 0 and (transparent.has(main.block("get",pos)) or main.block("get",pos) == 53) and !transparent.has(main.block("get",pos,0)):
+					if get_node("../chunks").get_node(str(main.get_chunk(pos.x))).has_node("0,"+str(main.chunkify(pos).x)+","+str(pos.y)) and get_layer(pos,true) > 0 and (transparent.has(main.block("get",pos)) or solidTrans.has(main.block("get",pos))) and !transparent.has(main.block("get",pos,0)):
 						get_node("../chunks").get_node(str(main.get_chunk(pos.x))).get_node("0"+","+str(main.chunkify(pos).x)+","+str(pos.y)+"/Sprite").material.set_shader_param("shade",lightArray[x][y]/15.0)
 
 func _on_Daylight_Cycle_timeout():

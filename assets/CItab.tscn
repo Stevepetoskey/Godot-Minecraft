@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://textures/Blocks/bedrock.png" type="Texture" id=1]
+[ext_resource path="res://textures/Gui/container/creative_inventory/tabs.png" type="Texture" id=2]
+[ext_resource path="res://scripts/CItab.gd" type="Script" id=3]
+
+[sub_resource type="AtlasTexture" id=1]
+atlas = ExtResource( 2 )
+region = Rect2( 0, 64, 28, 28 )
+
+[node name="CItab" type="TextureButton"]
+anchor_right = 0.015
+anchor_bottom = 0.028
+margin_right = -0.800001
+margin_bottom = -0.240002
+toggle_mode = true
+texture_normal = SubResource( 1 )
+script = ExtResource( 3 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 14.1726, 15.7166 )
+texture = ExtResource( 1 )
+
+[connection signal="pressed" from="." to="." method="_on_CItab_pressed"]

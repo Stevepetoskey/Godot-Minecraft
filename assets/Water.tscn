@@ -162,10 +162,16 @@ disabled = true
 [node name="Sprite" type="AnimatedSprite" parent="."]
 material = ExtResource( 3 )
 frames = SubResource( 34 )
-frame = 23
+frame = 22
 playing = true
 
 [node name="BlockCollide" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BlockCollide"]
 shape = SubResource( 35 )
+
+[node name="Spread" type="Timer" parent="."]
+wait_time = 0.25
+autostart = true
+
+[connection signal="timeout" from="Spread" to="." method="_on_Spread_timeout"]

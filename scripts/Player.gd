@@ -14,6 +14,7 @@ var new = true
 var health = 20
 var inAir = false
 var firstHeight = 0
+var flyMode = false
 
 var hunger = 20
 var saturation = 5
@@ -23,34 +24,46 @@ var sprintdis = 0
 var flip = 0
 var onLadder = []
 var inWater = []
+var stairRight = []
+var stairLeft = []
+var stairRightBottom = []
+var stairLeftBottom = []
+var onStairs = false
 var inMenu = false
 onready var holding = get_node("body/RightArm/holding")
 
+onready var hotbar = get_node("../CanvasLayer/hotbar")
+onready var inventory = get_node("../CanvasLayer/Inventory")
 onready var main = get_node("..")
-
+onready var globals = get_node("/root/GlobalScript")
 
 var playerLoadPos = Vector2(0,0)
 var playerChunk = 0
+var dead = false
 
 func _physics_process(_delta):
-	if ready and !get_node("../CanvasLayer/Inventory").visible:
+	if ready and !inventory.visible and !dead:
 		if Input.is_action_just_pressed("menu"):
 			get_node("../CanvasLayer/Menu").visible = !inMenu
 			inMenu = !inMenu
 		if !inMenu:
+			if Input.is_action_pressed("dropItem"):
+				get_node("../entities").add_item(inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"],1,position,true)
+				hotbar.remove_from_inventory(get_node("../CanvasLayer/hotbar/select").selected,1)
 			#Hunger handler
-			if !hungerEffect:
-				if hunger >= 18 and health<20:
-					$hungerEffect.start(4)
-					hungerEffect = true
-				elif hunger == 20 and health <20 and saturation > 0:
-					$hungerEffect.start(0.5)
-					hungerEffect = true
-			if exhaustion >= 4:
-				saturation -= 1
-				if saturation <= 0:
-					hunger -= 1
-				exhaustion -= 4
+			if globals.gamemode != "Creative":
+				if !hungerEffect:
+					if hunger >= 18 and health<20:
+						$hungerEffect.start(4)
+						hungerEffect = true
+					elif hunger == 20 and health <20 and saturation > 0:
+						$hungerEffect.start(0.5)
+						hungerEffect = true
+				if exhaustion >= 4:
+					saturation -= 1
+					if saturation <= 0:
+						hunger -= 1
+					exhaustion -= 4
 			get_node("../CanvasLayer/FPS").text = str(Engine.get_frames_per_second())
 			get_node("../CanvasLayer/Pos").text = str(Vector2(round(position.x/16),round(position.y/16)))
 			if Input.is_action_just_pressed("ui_down"):
@@ -61,10 +74,10 @@ func _physics_process(_delta):
 				$body/LeftArm/holding.hide()
 			else:
 				$body/RightArm/holding.hide()
-			if get_node("../CanvasLayer/hotbar").inventory[0][get_node("../CanvasLayer/hotbar/select").selected] > 0:
+			if inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"] > 0:
 				holding.show()
-				holding.texture = get_node("../CanvasLayer/hotbar").textures[get_node("../CanvasLayer/hotbar").inventory[0][get_node("../CanvasLayer/hotbar/select").selected]]
-				if get_node("../CanvasLayer/hotbar").itemData.has(get_node("../CanvasLayer/hotbar").inventory[0][get_node("../CanvasLayer/hotbar/select").selected]) or get_node("../CanvasLayer/hotbar").itemDamage.has(get_node("../CanvasLayer/hotbar").inventory[0][get_node("../CanvasLayer/hotbar/select").selected]):
+				holding.texture = hotbar.textures[inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"]]
+				if hotbar.itemData.has(inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"]) or hotbar.itemDamage.has(inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"]):
 					holding.scale = Vector2(1,1)
 					holding.position = Vector2(6*sign(-2*flip+1),8)
 				else:
@@ -101,6 +114,8 @@ func _physics_process(_delta):
 			if !Input.is_action_pressed("right") and !Input.is_action_pressed("left"):
 				motion.x = move_toward(motion.x,0,SPEED)
 				$AnimationPlayer.play("idle")
+			if Input.is_action_just_pressed("fly") and globals.gamemode == "Creative":
+				flyMode = !flyMode
 			if Input.is_action_pressed("break"):
 				if get_global_mouse_position().x < global_position.x:
 					$breakAni.play("breakLeft")
@@ -108,7 +123,7 @@ func _physics_process(_delta):
 					$breakAni.play("break")
 			else:
 				$breakAni.stop(true)
-			if inWater == [] and onLadder == []:
+			if inWater == [] and onLadder == [] and !flyMode:
 				if !is_on_floor():
 					if motion.y < 400:
 						motion.y += GRAVITY
@@ -122,7 +137,7 @@ func _physics_process(_delta):
 					if inAir:
 						if firstHeight - round(position.y/16.0) < -3:
 							take_damage((firstHeight - round(position.y/16.0) + 3)*-1)
-					if !$movement.playing and motion.x != 0 and blockOn != 0:
+					if !$movement.playing and motion.x != 0 and ![0,41,60].has(blockOn):
 						var soundFile = main.sound_data[main.block_data[blockOn].soundFiles].step
 						$movement.stream = load("res://Audio/" + soundFile + str(randi()%int(main.sound_amount[soundFile])+1) + ".ogg")
 						$movement.play()
@@ -134,13 +149,28 @@ func _physics_process(_delta):
 					else:
 						exhaustion += 0.05
 					motion.y = -JUMPSPEED
+				if is_on_wall() and !is_on_ceiling():
+					if motion.x < 0 and stairLeft.empty() and !stairLeftBottom.empty():
+						position.y -= 9
+						onStairs = true
+					elif motion.x > 0 and stairRight.empty() and !stairRightBottom.empty():
+						position.y -= 9
+						onStairs = true
+			elif flyMode:
+				inAir = false
+				if Input.is_action_pressed("jump"):
+					motion.y = -JUMPSPEED
+				elif Input.is_action_pressed("sneak"):
+					motion.y = JUMPSPEED
+				else:
+					motion.y = 0
 			elif inWater != []:
 				inAir = false
 				if Input.is_action_pressed("jump"):
 					motion.y = -JUMPSPEED/2
 				else:
 					motion.y = JUMPSPEED/2
-			else:
+			elif onLadder != []:
 				inAir = false
 				if Input.is_action_pressed("jump"):
 					motion.y = -JUMPSPEED/2
@@ -149,7 +179,10 @@ func _physics_process(_delta):
 				else:
 					motion.y = JUMPSPEED/2
 			if is_on_wall():
-				motion.x = 0
+				if !onStairs:
+					motion.x = 0
+				else:
+					onStairs = false
 			move_and_slide(motion,Vector2(0,-1))
 
 func flip_textures(f):
@@ -165,24 +198,29 @@ func flip_textures(f):
 	$LeftLeg.region_rect.position = Vector2(8,8+(12*int(f)))
 
 func take_damage(dmg,knockback = false,dir = 0,power = 200):
-	$hurt.play()
-	health -= dmg
-	if knockback:
-		motion.x += power * dir
-		motion.y -= power/1.5
-	$head.modulate = Color(1,0.5,0.5)
-	$body.modulate = Color(1,0.5,0.5)
-	$body/RightArm.modulate = Color(1,0.5,0.5)
-	$body/LeftArm.modulate = Color(1,0.5,0.5)
-	$RightLeg.modulate = Color(1,0.5,0.5)
-	$LeftLeg.modulate = Color(1,0.5,0.5)
-	yield(get_tree().create_timer(0.25), "timeout")
-	$head.modulate = Color(1,1,1)
-	$body.modulate = Color(1,1,1)
-	$body/RightArm.modulate = Color(1,1,1)
-	$body/LeftArm.modulate = Color(1,1,1)
-	$RightLeg.modulate = Color(1,1,1)
-	$LeftLeg.modulate = Color(1,1,1)
+	if globals.gamemode != "Creative":
+		$hurt.play()
+		health -= dmg
+		if health <= 0:
+			main.player_died()
+			$CollisionShape2D.disabled = true
+			dead = true
+		if knockback:
+			motion.x += power * dir
+			motion.y -= power/1.5
+		$head.modulate = Color(1,0.5,0.5)
+		$body.modulate = Color(1,0.5,0.5)
+		$body/RightArm.modulate = Color(1,0.5,0.5)
+		$body/LeftArm.modulate = Color(1,0.5,0.5)
+		$RightLeg.modulate = Color(1,0.5,0.5)
+		$LeftLeg.modulate = Color(1,0.5,0.5)
+		yield(get_tree().create_timer(0.25), "timeout")
+		$head.modulate = Color(1,1,1)
+		$body.modulate = Color(1,1,1)
+		$body/RightArm.modulate = Color(1,1,1)
+		$body/LeftArm.modulate = Color(1,1,1)
+		$RightLeg.modulate = Color(1,1,1)
+		$LeftLeg.modulate = Color(1,1,1)
 
 func _on_hunger_timeout():
 	exhaustion += 0.1
@@ -197,9 +235,10 @@ func _on_BlockTest_area_entered(area):
 			54:
 				onLadder.append(area)
 			41:
-				inWater.append(area)
+				if area.get_node("..").z == 1:
+					inWater.append(area)
 			60:
-				if get_node("../water").water[[area.get_node("..").global_position/ Vector2(16,16),1]] > 6:
+				if area.get_node("..").z == 1 and main.interactableBlockData[[area.get_node("..").pos,1]][0] > 6:
 					inWater.append(area)
 
 func _on_BlockTest_area_exited(area):
@@ -212,22 +251,25 @@ func _on_BlockTest_area_exited(area):
 
 func _on_Node2D_start():
 	if new:
-		var x = 0
-		var breakout = true
-		while breakout:
-			for y in range(128):
-				if main.block("get",Vector2(x,y)) > 0 and main.block("get",Vector2(x,y-1)) == 0 and main.block("get",Vector2(x,y-2)) == 0:
-					position = Vector2(x,y-4) * Vector2(16,16)
-					breakout = false
-					break
-			if x < 0:
-				x*=-1
-			elif x > 0:
-				x = x*-1 - 1
-			else:
-				x = -1
+		go_to_spawn()
 		new = false
 		get_node("../Lighting").playerLoaded = true
+
+func go_to_spawn():
+	var x = 0
+	var breakout = true
+	while breakout:
+		for y in range(128):
+			if main.block("get",Vector2(x,y)) > 0 and main.block("get",Vector2(x,y-1)) == 0 and main.block("get",Vector2(x,y-2)) == 0:
+				position = Vector2(x,y-4) * Vector2(16,16)
+				breakout = false
+				break
+		if x < 0:
+			x*=-1
+		elif x > 0:
+			x = x*-1 - 1
+		else:
+			x = -1
 
 func _on_Hunger_timeout():
 	if hunger >= 18 and health<20:
@@ -250,3 +292,35 @@ func _on_Node2D_world_loaded():
 
 func _on_walkEnd_timeout():
 	$movement.stop()
+
+func _on_stairTest_body_entered(body):
+	if body != self and body.is_in_group("block"):
+		stairRight.append(body)
+
+func _on_stairTestRight_body_exited(body):
+	if body != self and body.is_in_group("block"):
+		stairRight.erase(body)
+
+func _on_stairTestLeft_body_entered(body):
+	if body != self and body.is_in_group("block"):
+		stairLeft.append(body)
+
+func _on_stairTestLeft_body_exited(body):
+	if body != self and body.is_in_group("block"):
+		stairLeft.erase(body)
+
+func _on_stairTestRight2_body_entered(body):
+	if body != self and body.is_in_group("block"):
+		stairRightBottom.append(body)
+
+func _on_stairTestRight2_body_exited(body):
+	if body != self and body.is_in_group("block"):
+		stairRightBottom.erase(body)
+
+func _on_stairTestLeft2_body_entered(body):
+	if body != self and body.is_in_group("block"):
+		stairLeftBottom.append(body)
+
+func _on_stairTestLeft2_body_exited(body):
+	if body != self and body.is_in_group("block"):
+		stairLeftBottom.erase(body)

@@ -10,9 +10,6 @@ grow_horizontal = 2
 grow_vertical = 2
 rect_scale = Vector2( 0.9, 0.9 )
 script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Label" type="Label" parent="."]
 margin_left = 6.14398
@@ -20,15 +17,12 @@ margin_top = 9.05963
 margin_right = 66.144
 margin_bottom = 59.0596
 rect_scale = Vector2( 0.2, 0.2 )
-custom_fonts/font = ExtResource( 3 )
 custom_colors/font_color_shadow = Color( 0.321569, 0.321569, 0.321569, 1 )
 custom_constants/shadow_offset_x = 5
 custom_constants/shadow_offset_y = 5
+custom_fonts/font = ExtResource( 3 )
 text = "64"
 align = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [connection signal="mouse_entered" from="." to="." method="_on_inventoryIcon_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_inventoryIcon_mouse_exited"]

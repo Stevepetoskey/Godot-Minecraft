@@ -11,10 +11,10 @@ var guh = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var craft = [8,8,0,
-				 8,8,0,
-				 8,8,0]
-	var result = [62,3]
+	var craft = [52,0,0,
+				 52,52,0,
+				 52,52,52]
+	var result = [97,1]
 	var loc = 0
 	var orgin = Vector2(-1,-1)
 	var crafting = []
