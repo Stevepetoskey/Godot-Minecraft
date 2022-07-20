@@ -205,3 +205,8 @@ func _on_WorldType_pressed():
 	else:
 		worldTypeTab = 0
 	$CustomizeWorld/WorldType/Label.text = worldTypes[worldTypeTab]
+
+func _on_CreateTutorial_pressed():
+	get_node("../../Click").play()
+	globals.new_tutorial()
+	get_tree().change_scene("res://scene/Main.tscn")

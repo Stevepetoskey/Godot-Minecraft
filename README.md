@@ -4,14 +4,14 @@
 - loads of new building blocks (~)
 - better world generation (pre 1)
 - Set biomes (Plains (pre 1), Forest (pre 1), Ocean, Birch forest (pre 1), desert (pre 1), Mountains, Snow desert (pre 1), and Snow Forest (pre 1))
-- Structures (Dungeons, Towers)
-- add entities (Sheep, Creeper)
-- add bow with camera that moves with cursor to extent
+- Structures (Dungeons, Towers) (Release tbd)
+- add entities (Sheep, Creeper) (Alpha 5)
+- add bow with camera that moves with cursor to extent (Alpha 5)
 - Wheat (pre 3)
 - water acts like water (pre 4)
 - Gamemodes (Creative, Survival) (pre 5)
 - redstone dust (pre 3)
-- Menu needs to look better
+- Menu needs to look better (pre 6)
 - redstone (release tbd)
 - Add height limit (pre 5)
 
@@ -82,3 +82,9 @@ L: 2
 - When your health drops to zero, you die
 - Added stonebrick and cobblestone stairs
 - Added Oak, birch, spruce, sandstone, and brick stairs
+
+## Alpha 4 pre 6 (Final)
+- Pressing 'Q' now drops items
+- Fixed zombies and Skeletons not frequently spawning
+- Added tutorial world
+- Made menus look better

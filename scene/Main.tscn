@@ -361,7 +361,6 @@ text = "EC: 0"
 [node name="ParallaxBackground" type="ParallaxBackground" parent="CanvasLayer"]
 
 [node name="Sky" type="ParallaxLayer" parent="CanvasLayer/ParallaxBackground"]
-visible = false
 motion_scale = Vector2( 0.1, 0.01 )
 motion_offset = Vector2( 0, -400 )
 motion_mirroring = Vector2( 1440, 0 )

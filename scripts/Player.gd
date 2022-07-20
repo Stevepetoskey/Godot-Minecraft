@@ -47,6 +47,9 @@ func _physics_process(_delta):
 			get_node("../CanvasLayer/Menu").visible = !inMenu
 			inMenu = !inMenu
 		if !inMenu:
+			if Input.is_action_pressed("dropItem"):
+				get_node("../entities").add_item(inventory.inventory[get_node("../CanvasLayer/hotbar/select").selected]["id"],1,position,true)
+				hotbar.remove_from_inventory(get_node("../CanvasLayer/hotbar/select").selected,1)
 			#Hunger handler
 			if globals.gamemode != "Creative":
 				if !hungerEffect:
