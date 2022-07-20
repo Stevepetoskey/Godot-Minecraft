@@ -1,90 +1,77 @@
-# Minecraft in Godot Alpha 4 (Unstable branch)
-## Alpha 4 goals
-- caves (pre 1)
-- loads of new building blocks (~)
-- better world generation (pre 1)
-- Set biomes (Plains (pre 1), Forest (pre 1), Ocean, Birch forest (pre 1), desert (pre 1), Mountains, Snow desert (pre 1), and Snow Forest (pre 1))
-- Structures (Dungeons, Towers) (Release tbd)
-- add entities (Sheep, Creeper) (Alpha 5)
-- add bow with camera that moves with cursor to extent (Alpha 5)
-- Wheat (pre 3)
-- water acts like water (pre 4)
-- Gamemodes (Creative, Survival) (pre 5)
-- redstone dust (pre 3)
-- Menu needs to look better (pre 6)
-- redstone (release tbd)
-- Add height limit (pre 5)
+# Minecraft in Godot
+## Alpha 1
+Features:
+- World generation
+- Crafting
+- Full inventory
+- Minning
+- Building
+- Character animations
+## Alpha 2
+##### Features:
+- Infinite worlds
+- Biomes
+- Lakes and Oceans
+- Background layer
+- Loads of new blocks
+- Hearts and hunger
+- Furnaces
+- Diamonds
+- Bedrock at the bottom of the world to stop people from falling to the void
+##### Fixes:
+- fixed weird breaking animation
+- fixed items randomly disapearing in the hotbar
 
-BUGS THAT NEED FIXING
-- block rendering engine seems to be held together with duct tape and not as optimized as it could be
-- rework inventory system (pre 5)
-- fix furnaces not dropping items (pre 5)
+## Alpha 3
+##### Features:
+- Lighting system
+- More optimized block rendering
+- World save/load
+- Ladders
+- Pigs, Zombies, and skeletons
+- Day/Night cycle
+- Reworked hunger system to be more like minecraft
+- Raw/Cooked porkchops
+- Saplings
+- Ability to swim in water
+- Sound Effects
+- Doors
+##### Fixes:
+- Fixed right clicking anywhere in inventory also clicking the crafting output
+- Fixed chunks loading in the middle of the world even if the player is not there
+- Fixed furnace using fuel even if it is smelting after reloading the world
 
-O: 4
-Period: 15
-P: 0.185
-L: 3.54
-BL: 0.21
-
-World:
-O: 4
-Period: 87
-P: 0.767
-L: 1.88
-
-Temps:
-O:3
-Period: 131.8
-P: 0.5
-L:2
-
-Precip:
-O:4
-Period: 133.6
-P: 0.492
-L: 2
-
-## Alpha 4 pre 1
-- Added caves
-- Better World Generation
-- Set biomes
-- Added Sound effects (breaking,placing,walking ect...)
-- Added more music
-- Added gamemodes
+## Alpha 4
+##### Features:
+- Added Caves
+- Better world generation
+- Added Forest, Plains, Desert, Snowy plains, Snow desert, Taiga Biomes
+- Added more in game music
+- Added Menu music
+- Added Creative mode
 - Added flat worlds
-
-## Alpha 4 pre 2
-- Fixed light some times not rendering after loading world
-
-## Alpha 4 pre 3
 - Added redstone
-- Added redstone torch (only a light source right now)
+- Added redstone torches
 - Added Lapis Lazuli
-- Added gold
-- Added wheat (No farming yet)
-- Added bread
-- Added Golden items (pickaxes, axes, ect...)
+- Added Gold
+- Added Wheat and bread (No farming yet)
+- Added Golden tools
 - Added rotten flesh
 - Added grass
-
-## Alpha 4 pre 4
-- Fixed breaking glass crashing the game
-- Added Water system
-
-## Alpha 4 pre 5
+- Added water functionality
+- When your health drops to zero, you now die (Crazy)
+- Added stonebrick, cobblestone, oak, birch, spruce, sandstone, and brick stairs
+- Pressing 'Q' now drops items
+- Added tutorial world
+- Made menus look better
+##### Fixes:
+- Fixed light some times not rendering after loading world
 - Fixed right clicking on slots in inventory sometimes having unexpected results
 - Rewrote inventory system to make it more legible and less chaotic
 - Fixed furnace fire GUI not displaying the proper time left until fire runs out
 - Fixed furnace not dropping items when broken
 - Fixed being able to place blocks out of the world
-- Added creative inventory
+- Fixed breaking glass crashing the game
 - Fixed items immediately collecting once dropped
-- When your health drops to zero, you die
-- Added stonebrick and cobblestone stairs
-- Added Oak, birch, spruce, sandstone, and brick stairs
 
-## Alpha 4 pre 6 (Final)
-- Pressing 'Q' now drops items
-- Fixed zombies and Skeletons not frequently spawning
-- Added tutorial world
-- Made menus look better
+FIX ZOMBIES AND SKELETONS NOT SPAWNING
